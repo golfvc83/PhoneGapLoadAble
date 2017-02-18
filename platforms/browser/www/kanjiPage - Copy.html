@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2016 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+
+<head>
+    <meta charset="utf-8" />
+	<meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-eval' 'unsafe-inline'; img-src 'self' data:" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+	<meta http-equiv="Content-Security-Policy" content="default-src *; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'; img-src * data: 'unsafe-inline'; connect-src * 'unsafe-inline'; child-src *;" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <!-- Good default declaration:
+    * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+    * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+    * Disables use of eval() and inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+        * Enable inline JS: add 'unsafe-inline' to default-src
+        * Enable eval(): add 'unsafe-eval' to default-src
+    * Create your own at http://cspisawesome.com
+    -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+
+
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+	<!--boostrap include00-->
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+	<!-- must load jquery before bootstrap.mis.js -->
+	<script src="js/jquery.min.js"></script>
+	<script src = "js/bootstrap.min.js"></script>
+	<style>
+		@font-face { font-family: kanji; src: url('KanjiStrokeOrders_v4.000.ttf'); } 
+	</style>
+	<!-- drawingboard.js requirement-->
+	
+	<script src="js/simple-undo.js"></script>
+	<script src = "js/drawingboard.js"></script>
+	<link rel="stylesheet" href="css/drawingboard.css" />
+    <title>Hello World</title>
+</head>
+
+<!-- the size of the board some how effects whether or not on start drawing works -->
+<style>
+    #zbeubeu {
+        width: 387px;
+        height: 400px;
+    }
+	
+	.resultPanel{
+		background-color: white;
+		border-style:solid; border-color:lightgrey;
+		border-width: 1px;	
+		text-align:center;	
+	}
+	 
+	 .big {
+        width: 300px;
+        height: 320px;
+    }
+	
+	 .medium {
+        width: 135px;
+        height: 170px;
+    }
+	
+	 .small {
+        width: 50px;
+        height: 80px;
+    }
+	
+	.circle{
+		background: #FA8072;
+		border-radius: 50%;
+		border-style:solid; border-color:lightgrey;
+		border-width: 2px;	
+	}
+	
+	.kanjiBig{
+		font-size: 200px;
+		font-family: kanji;
+		
+	}
+	
+	.kanjiMid{
+		font-size: 100px; font-family: kanji
+	}
+	
+	.kanjiTiny{
+		font-size: 50px; font-family: kanji
+	}
+	
+	.score{
+		background-color: black;
+		font-color: white;
+		border-style:solid; border-color:lightgrey;
+		border-width: 2px;
+	}
+	
+	.output{
+		padding: 2px;
+	}
+</style>
+
+<body style = "padding: 20px">
+    
+     <h1>Kanji Drawing Board</h1>
+     <!--<div id = "list"></div>-->
+	 <div class="row">
+		
+		<div class="col-sm-4" >
+			<div class = "well">
+				<div id="zbeubeu" ></div>
+				<div>output:</div>
+				<input id = "output" class = "form-control output"> </input>
+				<div style = "height: 10px;"></div>
+				
+				<button class ="btn btn-default" onclick="clickk()">test</button>
+				<button class ="btn btn-default" >test1</button>	
+			</div>
+	</div>
+		
+		<div id = "strict result" class="col-sm-3 well">
+		 <div class="row">
+		 	<div class="col-sm-12">
+				<div>Exact Match</div>
+			</div>
+		 </div>	
+			 <div class="row" style = "padding: 2px;">
+				<div class="col-sm-12">
+					<div id = "strict1" class = "resultPanel big"><div class ="score"></div><font class = "kanjiBig"></font></div> <!---->
+				</div>
+			</div>
+					
+			<div class="row" style = "padding: 2px;">
+				<div class ="col-sm-6" >
+					<div id = "strict2" class = "resultPanel medium"><div class ="score"></div><font class = "kanjiMid"></font></div>
+				</div>
+			
+				<div class ="col-sm-6" >	
+					<div id = "strict3" class = "resultPanel medium"><div class ="score"></div><font class = "kanjiMid"></font></div>
+				</div>
+			</div>
+			
+			<div class="row" style = "padding: 2px;">
+				<div class ="col-sm-4" >
+						<div id = "strict4" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny">	</font></div>
+				</div>
+				
+				<div class ="col-sm-4" >
+						<div id = "strict5" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+				</div>
+				
+				<div class ="col-sm-4" >
+					<div id = "strict6" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+				</div>
+			</div>
+			
+			<div class="row" style = "padding: 2px;">
+				<div class ="col-sm-4" >
+					<div id = "strict7" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+				</div>
+				
+				<div class ="col-sm-4" >
+					<div id = "strict8" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+				</div>
+				
+				<div class ="col-sm-4" >
+					<div id = "strict9" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+				</div>
+			</div>
+		</div>
+		
+		
+		<div id = "fuzz1 result" class="col-sm-3 well">
+		 <div class="row">
+		 	<div class="col-sm-12">
+				<div>+-1</div>
+			</div>
+		 </div>	
+		 
+			 <div class="row" style = "padding: 2px;">
+				<div class="col-sm-12">
+					<div id = "fuzz11" class = "resultPanel big"><div class ="score"></div><font class = "kanjiBig"></font></div> <!---->
+				</div>
+			</div>
+					
+			<div class="row" style = "padding: 2px;">
+				<div class ="col-sm-6" >
+					<div id = "fuzz12" class = "resultPanel medium"><div class ="score"></div><font class = "kanjiMid"></font></div>
+				</div>
+			
+				<div class ="col-sm-6" >	
+					<div id = "fuzz13" class = "resultPanel medium"><div class ="score"></div><font class = "kanjiMid"></font></div>
+				</div>
+			</div>
+			
+			<div class="row" style = "padding: 2px;">
+				<div class ="col-sm-4" >
+						<div id = "fuzz14" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny">	</font></div>
+				</div>
+				
+				<div class ="col-sm-4" >
+						<div id = "fuzz15" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+				</div>
+				
+				<div class ="col-sm-4" >
+					<div id = "fuzz16" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+				</div>
+			</div>
+			
+			<div class="row" style = "padding: 2px;">
+				<div class ="col-sm-4" >
+					<div id = "fuzz17" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+				</div>
+				
+				<div class ="col-sm-4" >
+					<div id = "fuzz18" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+				</div>
+				
+				<div class ="col-sm-4" >
+					<div id = "fuzz19" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+				</div>
+			</div>
+		</div>
+		
+		
+			<div id = "fuzz2 result" class="col-sm-3 well">
+		 <div class="row">
+		 	<div class="col-sm-12">
+				<div>+-2</div>
+			</div>
+		 </div>	
+			 <div class="row" style = "padding: 2px;">
+				<div class="col-sm-12">
+					<div id = "fuzz21" class = "resultPanel big"><div class ="score"></div><font class = "kanjiBig"></font></div> <!---->
+				</div>
+			</div>
+					
+			<div class="row" style = "padding: 2px;">
+				<div class ="col-sm-6" >
+					<div id = "fuzz22" class = "resultPanel medium"><div class ="score"></div><font class = "kanjiMid"></font></div>
+				</div>
+			
+				<div class ="col-sm-6" >	
+					<div id = "fuzz23" class = "resultPanel medium"><div class ="score"></div><font class = "kanjiMid"></font></div>
+				</div>
+			</div>
+			
+			<div class="row" style = "padding: 2px;">
+				<div class ="col-sm-4" >
+						<div id = "fuzz24" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny">	</font></div>
+				</div>
+				
+				<div class ="col-sm-4" >
+						<div id = "fuzz25" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+				</div>
+				
+				<div class ="col-sm-4" >
+					<div id = "fuzz26" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+				</div>
+			</div>
+			
+			<div class="row" style = "padding: 2px;">
+				<div class ="col-sm-4" >
+					<div id = "fuzz27" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+				</div>
+				
+				<div class ="col-sm-4" >
+					<div id = "fuzz28" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+				</div>
+				
+				<div class ="col-sm-4" >
+					<div id = "fuzz29" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+				</div>
+			</div>
+		</div>
+		
+		
+		
+		
+		
+	 </div>
+	 
+</body>
+
+<script>
+	/*Think of f = new Foo(); as creating a class instance, Foo.prototype.bar = function(){...} as defining a shared method for the class, and Foo.baz = function(){...} as defining a public static method for the class.*/
+	
+	var STRICT = '#strict';
+	var FUZZOUT1 = '#fuzz1';
+	var FUZZOUT2 = '#fuzz2';
+	
+	function generatEvent(input){
+	
+		for(var i = 1; i < 10; i++){
+			id = input +i.toString();
+
+			$( id ).mouseover(function(e) {
+				var inner_id = '#'+ e.currentTarget.id;
+				var kanjiPic = $(inner_id+' > font');
+				if(kanjiPic != null){
+					kanjiPic.addClass('circle');
+				}
+			});
+	
+			$( id ).mouseout(function(e) {
+				var inner_id = '#'+ e.currentTarget.id;
+				var kanjiPic = $(inner_id+' > font');
+				if(kanjiPic != null){
+					kanjiPic.removeClass("circle");
+				}
+			});
+				
+				$( id ).click(function(e) {
+				var inner_id = '#'+ e.currentTarget.id;
+				var kanjiPic = $(inner_id+' > font');
+				if(kanjiPic != null){
+				var currentText = $('#output').val();
+					$('#output').val(currentText + kanjiPic.html());	
+				}
+			});
+		}
+	}
+	
+	generatEvent(STRICT);
+	
+	var myBoard;
+	
+	//kanji let's begin!
+	function UserException(message) {
+		this.message = message;
+		this.name = "UserException";
+	}
+		
+	/*var LOCATION_ENUM = {
+	N  : {VALUE1: 1, VALUE2: 0, UNICODE: "\u2580"}, 
+	NE : {VALUE1: 2, VALUE2: 0, UNICODE: "\u259c"},
+	E  : {VALUE1: 2, VALUE2: 1, UNICODE: "\u2590"},
+	SE : {VALUE1: 2, VALUE2: 2, UNICODE: "\u259f"},
+	S  : {VALUE1: 1, VALUE2: 2, UNICODE: "\u2584"},
+	SW : {VALUE1: 0, VALUE2: 2, UNICODE: "\u2599"},
+	W  : {VALUE1: 0, VALUE2: 1, UNICODE: "\u258c"},
+	NW : {VALUE1: 0, VALUE2: 0, UNICODE: "\u259b"},
+	MID : {VALUE1: 1, VALUE2: 1, UNICODE: "\u2588"}
+	};*/
+	
+	
+	var Location = function(location){
+		this.location = location;
+	}
+	
+	Location.N  = {NAME: "N", VALUE1: 1, VALUE2: 0, UNICODE: "\u2580"}; 
+	Location.NE = {NAME: "NE", VALUE1: 2, VALUE2: 0, UNICODE: "\u259c"};
+	Location.E  = {NAME: "E", VALUE1: 2, VALUE2: 1, UNICODE: "\u2590"};
+	Location.SE = {NAME: "SE", VALUE1: 2, VALUE2: 2, UNICODE: "\u259f"};
+	Location.S  = {NAME: "S", VALUE1: 1, VALUE2: 2, UNICODE: "\u2584"};
+	Location.SW = {NAME: "SW", VALUE1: 0, VALUE2: 2, UNICODE: "\u2599"};
+	Location.W  = {NAME: "W", VALUE1: 0, VALUE2: 1, UNICODE: "\u258c"};
+	Location.NW = {NAME: "NW", VALUE1: 0, VALUE2: 0, UNICODE: "\u259b"};
+	Location.MID = {NAME: "MID", VALUE1: 1, VALUE2: 1, UNICODE: "\u2588"};
+	
+	Location.get = function(x , y){
+		if(x < 85){
+			if(y < 85){
+				return new Location(Location.NW);
+			}else if(y < 170){
+				return new Location(Location.W);
+			}else{
+				return new Location(Location.SW);
+				}
+		}else if(x < 170){
+			if(y < 85){
+				return new Location(Location.N);
+			}
+			else if(y < 170){
+				return new Location(Location.MID);
+			}else{
+				return new Location(Location.S);
+				}
+		}else{
+			if(y < 85){
+				return new Location(Location.NE);
+			}else if(y < 170){
+				return new Location(Location.E);
+			}else{
+				return new Location(Location.SE);
+			}
+		}
+	}
+	
+	Location.prototype.isClose = function(other){
+		return Math.abs(this.location.VALUE1 - other.location.VALUE1) <= 1 && Math.abs(this.location.VALUE2 - other.location.VALUE2) <= 1;
+	}
+		
+	var Direction = function(direction){
+		this.direction = direction
+		 //alert(Direction.DIRECTION_THRESHOLD);
+		
+	}
+	
+	Direction.N  = {NAME: "N", VALUE1: 0,  UNICODE: "\u2191"}; 
+	Direction.NE = {NAME: "NE", VALUE1: 1,  UNICODE: "\u2197"};
+	Direction.E  = {NAME: "E", VALUE1: 2,  UNICODE: "\u2192"};
+	Direction.SE = {NAME: "SE", VALUE1: 3,  UNICODE: "\u2198"};
+	Direction.S  = {NAME: "S", VALUE1: 4,  UNICODE: "\u2193"};
+	Direction.SW = {NAME: "SW", VALUE1: 5,  UNICODE: "\u2199"};
+	Direction.W  = {NAME: "W", VALUE1: 6,  UNICODE: "\u2190"};
+	Direction.NW = {NAME: "NW", VALUE1: 7,  UNICODE: "\u2196"};
+	Direction.X  = {NAME: "X", VALUE1: -1, UNICODE: "\u26aa"};
+	
+	//defining static variable
+	Direction.DIRECTION_THRESHOLD = 51;
+	Direction.DIAGONAL_THRESHOLD = 77;
+	/**
+	 * Propotion (out of 256) of dominant movement required to count as diagonal.
+	 * (E.g. if this is 77 = approx 30%, and if movement S is 10, then movenent E must
+	 * be at least 10 * 77 / 256 in order to count as SE).
+	 */
+	 
+	 
+	Direction.prototype.isClose = function(other)
+	{
+		if(this.direction.NAME == "X" || other.direction.NAME == "X" || this.direction.NAME == other.direction.NAME){
+			return true;
+		}
+		return (this.direction.VALUE1 == ( (other.direction.VALUE1 + 1) % 8 ) ) || ( ((this.direction.VALUE1 + 1) % 8 ) == other.direction.VALUE1);
+	}
+	
+		
+	Direction.get = function(startX, startY, endX, endY, threshold){
+		//console.log("stroke created test: " + startX +", "+ endX +", "+ startY +", "+ endY+ ", "+ threshold);
+		
+		// Get movement in each direction
+		var deltaX = endX - startX, deltaY = endY - startY;
+
+		// Check if it's not really movement at all (under threshold)
+		var absDeltaX = Math.abs(deltaX), absDeltaY = Math.abs(deltaY);
+		if(absDeltaX < threshold && absDeltaY < threshold){
+			return new Direction(Direction.X);
+		}
+
+		if(absDeltaX > absDeltaY){
+			// X movement is more significant
+			var diagonal = absDeltaY > ((Direction.DIAGONAL_THRESHOLD * absDeltaX) >> 8);
+			if(deltaX > 0){
+				if(diagonal){
+					return deltaY < 0 ? new Direction(Direction.NE) : new Direction(Direction.SE);
+				}else{
+					return new Direction(Direction.E);
+				}
+			}else{
+				if(diagonal){
+					return deltaY < 0 ? new Direction(Direction.NW) : new Direction(Direction.SW);
+				}else{
+					return new Direction(Direction.W);
+				}
+			}
+		}else{
+			// Y movement is more significant
+			var diagonal = absDeltaX > ((Direction.DIAGONAL_THRESHOLD * absDeltaY) >> 8);
+			if(deltaY > 0){
+				if(diagonal){
+					return deltaX < 0 ? new Direction(Direction.SW) : new Direction(Direction.SE);
+				}else{
+					return new Direction(Direction.S);
+				}
+			}else{
+				if(diagonal){
+					return deltaX < 0 ? new Direction(Direction.NW) : new Direction(Direction.NE);
+				}else{
+					return new Direction(Direction.N);
+				}
+			}
+		}
+	}
+		
+	var Stroke = function(startX, startY, endX, endY){
+		if(startX < 0 || startX > 255 || startY < 0 || startY > 255
+		|| endX < 0 || endX > 255 || endY < 0 || endY > 255){ 
+			throw new UserException("Value out of range");
+		}
+		this._startX = startX;
+		this._endX = endX;
+		this._startY = startY;
+		this._endY = endY;
+		
+		/*console.log("stroke created test: " + this._startX +", "+ this._endX +", "+ this._startY +", "+ this._endY);*/
+	
+	}
+	
+	Stroke.prototype.getDirection = function(){
+	
+		return Direction.get(this._startX, this._startY, this._endX, this._endY, Direction.DIRECTION_THRESHOLD);
+		
+		/*return Direction.get(this._startX, this._startY, this._endX, this._endY,   Direction.DIRECTION_THRESHOLD);*/
+		
+	}
+	
+	Stroke.prototype.getStartLocation = function(){
+		
+		return Location.get(this._startX, this._startY);
+		
+	}
+	
+	
+	Stroke.prototype.getEndLocation = function(){
+		
+		return Location.get(this._endX, this._endY);
+		
+	}
+	
+	Stroke.prototype.getMoveDirection = function(previous){
+	
+		return Direction.get(previous._endX, previous._endY, this._startX, this._startY, Direction.DIRECTION_THRESHOLD);
+
+	}
+		
+	var KanjiInfo = function(kanji, full){
+		
+		this.kanji = '';
+		this.strokes = [count];	
+		this.strokeDirections = null;
+		this.strokeStarts = null;
+		this.strokeEnds = null;		
+		this.moveDirections = null;
+		this.loadingStroke = [];
+		
+		
+		if (arguments.length == 2) {
+		this.kanji = String.fromCharCode(parseInt(kanji,16))
+		var count = (full.length+1) / 12;
+		
+		if((count * 12 - 1) != full.length){
+			throw new UserException("Invalid full (" + full + ") for kanji (" + kanji + ")");
+		}
+		
+		try{
+			var offset = 0;
+			for(var i = 0; i < count; i++){
+				if(i != 0){
+					offset++; // Skip colon
+				}
+				this.strokes[i] = new Stroke(
+					getTwoDigitHexInt(full, offset),
+					getTwoDigitHexInt(full, offset+3),
+					getTwoDigitHexInt(full, offset+6),
+					getTwoDigitHexInt(full, offset+9));
+					
+					//this.strokes[i].getDirection();
+					//this.strokes[i].getStartLocation();
+					//this.strokes[i].getEndLocation();
+				offset+=11
+			}
+			
+		}catch(e){
+			console.log("can not init all strokes for a kanji");
+		}
+		
+		//omg closure 
+		//var that = this;
+		
+		//findDirections();
+		
+		}else{
+			this.kanji = kanji;
+			//alert("second option " + kanji);
+		}
+		
+		function getTwoDigitHexInt(input, pos){
+			var a = input.charCodeAt(pos);	
+			var b = input.charCodeAt(pos+1);
+		
+			var high =  a > '9'.charCodeAt() ? ( a - 'a'.charCodeAt() + 10 ) : (a - '0'.charCodeAt());
+			var low  =  b > '9'.charCodeAt() ? ( b - 'a'.charCodeAt() + 10 ) : (b - '0'.charCodeAt());
+			return high << 4 | low;
+		}
+		
+		/*function findDirections(){
+			
+			that.strokeDirections = [that.strokes.length];
+			that.strokeStarts = [that.strokes.length];
+			that.strokeEnds = [that.strokes.length];	
+            that.moveDirections = [that.strokes.length == 0 ? 0 : that.strokes.length - 1];
+			
+			for(var i = 0;i<that.strokes.length;i++){
+				that.strokeDirections[i] = that.strokes[i].getDirection();
+				that.strokeStarts[i] = that.strokes[i].getStartLocation();
+				that.strokeEnds[i] = that.strokes[i].getEndLocation();
+			}
+				
+			for(var i=1; i< that.strokes.length; i++){
+				that.moveDirections[i-1] = that.strokes[i].getMoveDirection(that.strokes[i-1]);
+			}
+		}*/
+	 
+	}
+	
+	KanjiInfo.prototype.findDirections = function(){
+			
+			this.strokeDirections = [this.strokes.length];
+			this.strokeStarts = [this.strokes.length];
+			this.strokeEnds = [this.strokes.length];	
+            this.moveDirections = [this.strokes.length == 0 ? 0 : this.strokes.length - 1];
+			
+			for(var i = 0;i<this.strokes.length;i++){
+				this.strokeDirections[i] = this.strokes[i].getDirection();
+				this.strokeStarts[i] = this.strokes[i].getStartLocation();
+				this.strokeEnds[i] = this.strokes[i].getEndLocation();
+			}
+				
+			for(var i=1; i< this.strokes.length; i++){
+				this.moveDirections[i-1] = this.strokes[i].getMoveDirection(this.strokes[i-1]);
+			}
+			
+	}
+	
+	KanjiInfo.prototype.printLoadingStroke = function(stroke){
+		console.log('print loading stroke');
+		for(var i = 0 ; i< this.loadingStroke.length; i++){
+			console.log(this.loadingStroke[i]);
+		}
+	}	
+	
+	KanjiInfo.prototype.getLoadingStroke = function(){
+		var newStroke = [];
+		for(var i = 0 ; i< this.loadingStroke.length; i++){
+			newStroke[i] = this.loadingStroke[i];
+		}
+		return newStroke;
+	}
+	
+	KanjiInfo.prototype.isLoadingStroke = function(){
+		return thisLoadingStroke == [];
+	}
+	
+	KanjiInfo.prototype.setLoadingStroke = function(stroke){
+		this.loadingStroke = stroke;
+	}
+	
+	KanjiInfo.prototype.addStroke = function(stroke){
+		this.loadingStroke.push(stroke);
+	}
+	
+	KanjiInfo.prototype.clearStroke = function(stroke){
+		this.loadingStroke = [];
+	}
+	
+	KanjiInfo.prototype.normaliseStroke = function(){
+		this.strokes = InputStroke.normalise(this.loadingStroke);
+	}
+	
+	KanjiInfo.prototype.printStroke = function(){
+		
+		for(var i = 0;i < this.strokes.length; i++){
+			console.log(this.strokes[i]); 
+		}
+	}
+	
+	KanjiInfo.prototype.getStrokeCount = function(){
+		return this.strokeDirections.length;
+	}
+	
+	KanjiInfo.prototype.getStroke = function(index){
+		return this.strokes[index];
+	}
+	
+	var StrictComparer = function(info){
+		this.drawnStarts = info.strokeStarts;
+		this.drawnEnds = info.strokeEnds;
+		this.drawnDirections = info.strokeDirections;
+		this.drawnMoves = info.moveDirections;
+	}
+	
+	StrictComparer.STROKE_DIRECTION_WEIGHT = 1.0;
+	StrictComparer.MOVE_DIRECTION_WEIGHT = 0.8;
+	StrictComparer.STROKE_LOCATION_WEIGHT = 0.6;
+	StrictComparer.CLOSE_WEIGHT = 0.7;
+	
+	StrictComparer.prototype.getMatchScore = function(other){
+		var otherStarts = other.strokeStarts;
+		var otherEnds = other.strokeEnds;
+		var otherDirections = other.strokeDirections;
+		var otherMoves = other.moveDirections;
+
+		if(otherStarts.length != this.drawnStarts.length)
+		{
+			console.log('we are dead the length of comparing kanji must be the same');
+			//throw new IllegalArgumentException(
+				//"Can only compare with same match length");
+		}
+
+		var score = 0;
+		for(var i=0; i<this.drawnStarts.length; i++)
+		{
+			// Stroke direction
+			if(this.drawnDirections[i].direction == otherDirections[i].direction)
+			{
+				score += StrictComparer.STROKE_DIRECTION_WEIGHT;
+			}
+			else if(this.drawnDirections[i].isClose(otherDirections[i]))
+			{
+				score += StrictComparer.STROKE_DIRECTION_WEIGHT * StrictComparer.CLOSE_WEIGHT;
+			}
+
+			// Move direction
+			if(i>0)
+			{
+				if(this.drawnMoves[i-1].direction == otherMoves[i-1].direction)
+				{
+					score += StrictComparer.MOVE_DIRECTION_WEIGHT;
+				}
+				else if(this.drawnMoves[i-1].isClose(otherMoves[i-1]))
+				{
+					score += StrictComparer.MOVE_DIRECTION_WEIGHT * StrictComparer.CLOSE_WEIGHT;
+				}
+			}
+
+			// Start and end locations
+			if(this.drawnStarts[i].location == otherStarts[i].location)
+			{
+				score += StrictComparer.STROKE_LOCATION_WEIGHT;
+			}
+			else if(this.drawnStarts[i].isClose(otherStarts[i]))
+			{
+				score += StrictComparer.STROKE_LOCATION_WEIGHT * StrictComparer.CLOSE_WEIGHT;
+			}
+			if(this.drawnEnds[i].location == otherEnds[i].location)
+			{
+				score += StrictComparer.STROKE_LOCATION_WEIGHT;
+			}
+			else if(this.drawnEnds[i].isClose(otherEnds[i]))
+			{
+				score += StrictComparer.STROKE_LOCATION_WEIGHT * StrictComparer.CLOSE_WEIGHT;
+			}
+		}
+
+		var max = this.drawnStarts.length * (StrictComparer.STROKE_DIRECTION_WEIGHT + 2 * StrictComparer.STROKE_LOCATION_WEIGHT)
+			+	(this.drawnStarts.length - 1) * StrictComparer.MOVE_DIRECTION_WEIGHT;
+
+		return 100 * score / max;
+	}
+	
+	
+		
+		/*hashmap syntax
+		// add a item
+		//kanjiList[key1] = value1;
+		// or remove it
+		//delete map[key1];
+		// or determine whether a key exists
+		//key1 in map;*/
+	
+	var clearFlag = false; 
+	window.onload = function(){
+		$('.drawing-board-control-navigation-back').on('click', function() {
+		/* your code here */
+			console.log('undo');
+			var i = stack1.pop();
+			console.log('revert to '+ stack1[stack1.length-1]);
+			stack2.push(i);
+		});
+		
+		$('.drawing-board-control-navigation-forward').on('click', function() {
+		/* your code here */
+			console.log('forward');
+			var i = stack2.pop();
+			console.log('forward to '+ i);
+			stack1.push(i);
+		});
+		
+		$('.drawing-board-control-navigation-reset').on('click', function() {
+		/* your code here */
+			
+			clearFlag = true;
+			
+		});
+		
+		//myBoard.reset({ background: true });
+		
+		/*myBoard.$el.on('click', '.drawing-board-control-navigation-back', $.proxy(function(e) {
+				var i = stack1.pop();
+				console.log('revert to '+ stack1[stack1.length-1]);
+				stack2.push(i);
+			}, myBoard));
+		
+		myBoard.$el.on('click', '.drawing-board-control-navigation-forward', $.proxy(function(e) {
+				//alert('forward');
+				var i = stack2.pop();
+				console.log('forward to '+ i);
+				stack1.push(i);
+			}, myBoard));*/
+	};
+		// init drawing board
+		var kanjiList = {};
+		myBoard = new DrawingBoard.Board('zbeubeu',{size: 6, undo: false});//pencil size6
+		myBoard.ev.bind('board:startDrawing',why1111);
+		myBoard.ev.bind('board:stopDrawing',why2);
+		myBoard.ev.bind('board:reset',why3);
+		myBoard.ev.bind('historyNavigation',why4);
+		
+		//extends further undo and redo functionality 
+		var stack1 = [];
+		var stack2 = [];
+		var  dummy = 0;
+		stack1.push(dummy);
+		
+		/*stack.push(2);       // stack is now [2]
+		stack.push(5);       // stack is now [2, 5]
+		var i = stack.pop(); // stack is now [2]
+		alert(i);            // displays 5 */
+		
+		function why4(){
+			console.log('init history');
+		}
+		
+		//myBoard.ev.bind('board:mouseOver',why4);
+		//myBoard.ev.bind('board:mouseOver',why2);
+
+	
+		//var kanji = new KanjiInfo("iku",";asdasda"); 
+		var rawFile = new XMLHttpRequest();
+		var file = "strokes-20160712.xml";
+    
+		rawFile.open("GET", file, false);
+		rawFile.onreadystatechange = function (){
+			if(rawFile.readyState === 4)
+			{
+				if(rawFile.status === 200 || rawFile.status == 0)
+				{
+                /*var allText = rawFile.responseText;
+                alert(allText);*/
+				}
+			}
+		}
+		
+		rawFile.send(null);
+		var allText = rawFile.responseText;
+		//alert(allText);
+	
+		parser = new DOMParser();
+		xmlDoc = parser.parseFromString(allText, "text/xml");
+	
+		var xx = xmlDoc.documentElement.childNodes;
+		
+		for(var i = 0; i < xx.length; i++){
+		//xx[1].nodeType
+			if(xx[i].nodeType == 1){
+				var at1 = xx[i].attributes[0].value;
+				var at2 = xx[i].attributes[1].value;
+				//var uniConverted = String.fromCharCode(parseInt(c,16))
+				
+				var kanji = new KanjiInfo(at1,at2); 
+				kanji.findDirections();
+				
+				//sort into hashMap
+				var strokeCount = kanji.strokes.length;
+				
+				if(kanjiList[strokeCount]  == null){
+					kanjiList[strokeCount] = [];
+					kanjiList[strokeCount].push(kanji);
+				}else{
+					kanjiList[strokeCount].push(kanji);
+				} 
+				
+				/*if(uniConverted == 'あ'){
+					console.log(c + ' :' + uniConverted);
+				}*/
+			}
+		}
+		
+		//var kanjiInfo = new KanjiInfo("884C","40,00-04,31:4c,3c-00,9b:2c,7a-2f,ff:76,14-df,0c:60,5a-ff,4c:b6,5a-a0,ea"); 
+		//kanjiInfo.findDirections();
+		//var strict = new StrictComparer(kanjiInfo);
+		
+		
+		
+		var startX, startY, endX, endY;
+		var potentialKanji = new KanjiInfo("?");
+		
+		
+		function convert(value){
+			//return (value * 255) + 0.49999;
+			//return parseInt((value * 255).toFixed(2));
+			//return Math.round(value * 255 * 100)/100;
+			return Math.round(value * 255);
+		}
+		
+		InputStroke = function(startX, startY, endX, endY){
+			this.startX = startX; 
+			this.startY = startY;
+			this.endX = endX; 
+			this.endY = endY;
+		}
+		
+					
+		InputStroke.normalise = function(strokes){
+		// Find range
+		
+		var minX = Number.MAX_VALUE, minY = Number.MAX_VALUE, 
+			maxX = Number.MIN_VALUE, maxY = Number.MIN_VALUE;
+		
+		strokes.forEach( function(stroke) {
+		
+			if(stroke.startX < minX){
+				minX = stroke.startX;
+			}
+			if(stroke.startX > maxX){
+				maxX = stroke.startX;
+			}
+			if(stroke.startY < minY)
+			{
+				minY = stroke.startY;
+			}
+			if(stroke.startY > maxY)
+			{
+				maxY = stroke.startY;
+			}
+
+			if(stroke.endX < minX)
+			{
+				minX = stroke.endX;
+			}
+			if(stroke.endX > maxX)
+			{
+				maxX = stroke.endX;
+			}
+			if(stroke.endY < minY)
+			{
+				minY = stroke.endY;
+			}
+			if(stroke.endY > maxY)
+			{
+				maxY = stroke.endY;
+			}
+		} );
+
+		// Adjust max/min to avoid divide by zero
+		if( Math.abs(minX - maxX) < 0.0000000001){
+			// Adjust by 1% of height
+			var adjust = Math.abs(minY - maxY) / 100;
+			if (adjust < 0.0000000001)
+			{
+				adjust = 0.1;
+			}
+			minX -= adjust;
+			maxX += adjust;
+		}
+		if(Math.abs(minY - maxY) < 0.0000000001)
+		{
+			// Adjust by 1% of width
+			var adjust = Math.abs(minX - maxX) / 100;
+			if(adjust < 0.0000000001)
+			{
+				adjust = 0.1;
+			}
+
+			minY -= adjust;
+			maxY += adjust;
+		}
+
+		// Now sort out a maximum scale factor, so that very long/thin kanji
+		// don't get stretched to square
+		var xRange = Math.abs(minX - maxX), yRange = Math.abs(minY - maxY);
+		if(xRange > 5 * yRange)
+		{
+			var adjust = (xRange - yRange) / 2;
+			minY -= adjust;
+			maxY += adjust;
+		}
+		else if(yRange > 5 * xRange)
+		{
+			var adjust = (yRange - xRange) / 2;
+			minX -= adjust;
+			maxX += adjust;
+		}
+
+		// Convert all points according to range
+		var output = [strokes.length];
+		for(var i=0; i<strokes.length; i++)
+		
+		{
+			output[i] = new Stroke(
+				convert((strokes[i].startX - minX) / (maxX - minX)),
+				convert((strokes[i].startY - minY) / (maxY - minY)),
+				convert((strokes[i].endX - minX) / (maxX - minX)),
+				convert((strokes[i].endY - minY) / (maxY - minY)));
+		}
+		
+		return output;
+	}
+	
+	
+	
+	function why1111() {
+		//console.log('startDrawing');
+		//console.log(myBoard.customAlert());
+		startX = myBoard.customAlert().x;
+		startY = myBoard.customAlert().y;
+	}
+	
+	
+	var Result = function( kanji, score){
+		this.kanji = kanji;
+		this.score = score;
+	}
+	
+	var results = [];
+	var results_fuz = [];
+	var results_fuzout1 = [];
+	var results_fuzout2 = [];
+	
+	/*currMax = results[0];
+	
+	for(var i = 1; i < results.length; i++){	
+		if(currMax.score < results[i].score){
+			currMax = results[i];
+		}
+	}
+	
+	console.log(currMax);*/
+	
+	function sortResult(f_results){
+		for(var i = 1; i < f_results.length; i++){
+			var j = i;
+			while(j >= 1){
+				if(f_results[j-1].score < f_results[j].score){
+					var temp = f_results[j];
+					f_results[j] = f_results[j-1];
+					f_results[j-1] = temp;
+				}else{	
+					break;
+				}
+				j--;
+			}
+		}
+		return f_results;
+	}
+	
+	
+	var map;
+	
+	function why2() {
+		
+		/*endX = myBoard.customAlert().x;
+		endY = myBoard.customAlert().y;		
+		var inputStroke = new InputStroke(startX, startY, endX, endY);
+		potentialKanji.addStroke(inputStroke);*/
+		
+		findMatch();
+		dummy += 1;
+		stack1.push(dummy);
+		/*if(potentialKanji.strokes.length == 6){
+			//potentialKanji.printLoadingStroke();
+			console.log('Match Score is :' + strict.getMatchScore(potentialKanji));
+		}else{
+			console.log(potentialKanji.strokes.length);
+		}*/
+		
+		//do kani compare
+		//print out list of possible kanji
+		
+	}
+	 
+	function findMatch(){
+		
+		//clear screen first
+		for(var i = 1; i< 10; i++){
+
+			var strictId =  STRICT + i.toString();
+			$(strictId).find('.score').html('');
+			$(strictId).find('font').html('');
+				//document.getElementById(strict);
+		}
+		
+	    potentialKanji.normaliseStroke();
+		//potentialKanji.printStroke();
+		potentialKanji.findDirections();
+		
+		//begin comparing process;
+		var strict = new StrictComparer(potentialKanji);
+		var fuzzy = new FuzzyComparer(potentialKanji);
+		
+		var strokeCount = potentialKanji.strokes.length; 
+		 
+		if(kanjiList[strokeCount]  == null){	
+			console.log('how can there be a kanji with more than 30 strokes -*-');
+		}else{
+			//map = new Map();
+			//potentialKanji.printLoadingStroke();
+			var kanjiWithSameStroke = kanjiList[strokeCount];
+			
+			var kanjiStrokePlusOne;
+			var kanjiStrokePlusTwo;
+			var kanjiStrokeMinusOne;
+			var kanjiStrokeMinusTwo;
+			
+			if(strokeCount <= 29){
+				kanjiStrokePlusOne = kanjiList[strokeCount+1];
+				if(strokeCount <= 28){
+					var kanjiStrokePlusTwo = kanjiList[strokeCount+2];
+				}
+			}
+			
+			if(strokeCount >= 2){
+				kanjiStrokeMinusTwo = kanjiList[strokeCount-1];
+				if(strokeCount >= 3){
+					kanjiStrokeMinusTwo = kanjiList[strokeCount-2];
+				}
+			}
+			
+			//var kanjiRanking = [];
+			
+			for(var i = 0; i < kanjiWithSameStroke.length; i++){
+				var score = strict.getMatchScore(kanjiWithSameStroke[i]);
+				var score_fuzz = fuzzy.getMatchScore(kanjiWithSameStroke[i]);
+				//map.set(score, kanjiWithSameStroke[i].kanji);	
+				if(score > 80){
+					results.push(new Result(kanjiWithSameStroke[i].kanji, score));
+				}
+				
+				if(score_fuzz > 80){
+					results_fuz.push(new Result(kanjiWithSameStroke[i].kanji, score_fuzz));
+				}
+			}
+				
+			//fuzzout1
+			if(kanjiStrokePlusOne != null){
+				for(var i = 0; i < kanjiStrokePlusOne.length; i++){	
+					var score_fuzz = fuzzy.getMatchScore(kanjiStrokePlusOne[i]);
+					if(score_fuzz > 80){
+						results_fuzout1.push(new Result(kanjiStrokePlusOne[i].kanji, score_fuzz));
+					}
+				}
+			}
+			
+			if(kanjiStrokeMinusOne != null){
+				for(var i = 0; i < kanjiStrokeMinusOne.length; i++){	
+					var score_fuzz = fuzzy.getMatchScore(kanjiStrokeMinusOne[i]);
+					if(score_fuzz > 80){
+						results_fuzout1.push(new Result(kanjiStrokeMinusOne[i].kanji, score_fuzz));
+					}
+				}
+			}
+			
+			//fuzzout2
+			if(kanjiStrokePlusTwo != null){
+				for(var i = 0; i < kanjiStrokePlusTwo.length; i++){	
+					var score_fuzz = fuzzy.getMatchScore(kanjiStrokePlusTwo[i]);
+					if(score_fuzz > 80){
+						results_fuzout2.push(new Result(kanjiStrokePlusTwo[i].kanji, score_fuzz));
+					}
+				}
+			}
+			
+			if(kanjiStrokeMinusTwo != null){
+				for(var i = 0; i < kanjiStrokeMinusTwo.length; i++){	
+					var score_fuzz = fuzzy.getMatchScore(kanjiStrokeMinusTwo[i]);
+					if(score_fuzz > 80){
+						results_fuzout2.push(new Result(kanjiStrokeMinusTwo[i].kanji, score_fuzz));
+					}
+				}
+			}
+			
+			results = sortResult(results);
+			results_fuz = sortResult(results_fuz);
+			results_fuzout1 = sortResult(results_fuzout1);
+            results_fuzout2 = sortResult(results_fuzout2);
+			
+			//console.log(results);
+			for(var i = 0; i< results.length ;i++){
+				if(i > 8 ){
+					break;
+				}
+				var f =  ( i+1 ).toString();
+				var strictId =  STRICT + f;
+				$(strictId).find('.score').html(Math.round(results[i].score).toString()+'%');
+				$(strictId).find('font').html(results[i].kanji);
+				//document.getElementById(strict);
+			}
+			
+			for(var i = 0; i< results_fuzout1.length ;i++){
+				if(i > 8 ){
+					break;
+				}
+				var f =  ( i+1 ).toString();
+				var Id =  FUZZOUT1 + f;
+				$(Id).find('.score').html(Math.round(results_fuzout1[i].score).toString()+'%');
+				$(Id).find('font').html(results_fuzout1[i].kanji);
+				//document.getElementById(strict);
+			}
+			
+			for(var i = 0; i< results_fuzout2.length ;i++){
+				if(i > 8 ){
+					break;
+				}
+				var f =  ( i+1 ).toString();
+				var Id =  FUZZOUT2 + f;
+				$(Id).find('.score').html(Math.round(results_fuzout2[i].score).toString()+'%');
+				$(Id).find('font').html(results_fuzout2[i].kanji);
+				//document.getElementById(strict);
+			}
+			
+			results = [];
+			results_fuz = [];
+			results_fuzout1 = [];
+            results_fuzout2 = [];
+			//var mapAsc = new Map([...map.entries()].sort().reverse());
+			//console.log(results);
+			
+		} 
+		
+	}
+	
+	function why3() {
+		//wtf the startDrawing event some how unbinds when clear button is pressed, therefore have to redo it here
+		myBoard.ev.bind('board:startDrawing',why1111);
+	}
+	
+	function why4(){
+		alert('yahalo');
+	}
+	
+	function why4(){
+		$('#board_coor').html('x: '+ myBoard.customAlert().x+' '+'y: '+ myBoard.customAlert().y);
+	}
+	//89.5 %
+	//[[109.0,132.0:60.0,165.0], [101.0,164.0:55.0,199.0], [74.0,179.0:83.0,237.0], [134.0,128.0:182.0,141.0], [131.0,160.0:181.0,166.0], [167.0,164.0:145.0,227.0]]
+	//[[108,9:10,87], [92,84:0,166], [38,119:56,255], [159,0:255,30], [153,75:253,89], [225,84:181,232]]
+	
+	/*var inputList= []; 
+	 potentialKanji.addStroke(new InputStroke(109.0, 132.0, 60.0, 165.0));
+	 potentialKanji.addStroke(new InputStroke(101.0, 164.0, 55.0, 199.0));
+	 potentialKanji.addStroke(new InputStroke(74.0, 179.0, 83.0, 237.0));
+	 potentialKanji.addStroke(new InputStroke(134.0, 128.0, 182.0, 141.0));
+	 potentialKanji.addStroke(new InputStroke(131.0, 160.0, 181.0, 166.0));
+	 potentialKanji.addStroke(new InputStroke(167.0, 164.0, 145.0, 227.0));
+	 
+	 potentialKanji.normaliseStroke();
+	 console.log(potentialKanji.strokes[0]);
+	 
+	 potentialKanji.findDirections();
+	 
+	 var strict = new StrictComparer(kanjiInfo);
+	 console.log(strict.getMatchScore(potentialKanji));*/
+	 
+	 var inputList= []; 
+	 //potentialKanji.addStroke(new InputStroke(1, 2, 3, 4));
+	 //potentialKanji.addStroke(new InputStroke(5, 6, 7, 8));
+	 //potentialKanji.addStroke(new InputStroke(15, 16, 17, 98));
+	 //potentialKanji.addStroke(new InputStroke(15, 16, 17, 98));
+	 //potentialKanji.addStroke(new InputStroke(15, 16, 17, 98));
+	 //potentialKanji.addStroke(new InputStroke(15, 16, 17, 98));
+	 
+	 
+	 //this is how to init potential kanji
+	 /*var potentialKanjiTest = new KanjiInfo("?");
+     potentialKanjiTest.addStroke(new InputStroke(59.0,190.0,156.0,189.0));
+ 	 potentialKanjiTest.normaliseStroke();
+	 potentialKanjiTest.findDirections();
+	 
+	 var strict = new StrictComparer(potentialKanjiTest);
+		var strokeCount = potentialKanjiTest.strokes.length;  
+		if(kanjiList[strokeCount]  == null){	
+			console.log('how can there be a kanji with more than 30 strokes -*-');
+		}else{
+			var kanjiWithSameStroke = kanjiList[strokeCount];
+			for(var i = 0; i < kanjiWithSameStroke.length; i++){
+				var score = strict.getMatchScore(kanjiWithSameStroke[i]);
+			}
+		} */
+	 
+	 /*potentialKanji.strokeStarts;
+	 potentialKanji.strokeEnds;
+	 potentialKanji.strokeDirections;
+	 potentialKanji.moveDirections*/
+	 //potentialKanji.printStroke();
+	 
+
+	function clickk(){
+		//sessionStorage.getItem('label')
+		alert('test');
+		sessionStorage.setItem('label', 'value');
+		window.location.href = "index.html";
+		//
+	}
+	
+		//Fuzzy Comparer
+	var FuzzyComparer = function(drawn){
+	
+		this.drawnPairs = FuzzyComparer.convertKanjiInfo(drawn);
+		this.drawnPoints = FuzzyComparer.getPairPoints(this.drawnPairs);
+		saveFuzzyState = this;
+		this.drawnPairs.forEach( function(pair) {
+			
+			//do this tomorrow
+			pair.initDrawn(saveFuzzyState.drawnPairs.length + 2);
+			
+		});
+		//console.log(drawnPoints);
+	}
+	
+	FuzzyComparer.SCOREMULTI_NOT_PAIR = 0.9;
+	FuzzyComparer.SCOREMULTI_WRONG_DIRECTION = 0.97;
+	FuzzyComparer.BEST_SCORES_SORT_FIRST = 5;
+	
+	var Pair = function(a, b){
+		this.a = a;
+		this.b = b; 
+		this.pointCount;
+		this.scores;
+		this.maxBScore; 
+		this.maxAScore;
+		this.bestScore;
+		this.bestAIndex; 
+		this.bestBIndex;
+		
+	}
+	
+	Pair.prototype.initDrawn = function(maxStrokes){
+			//scores = new float[maxStrokes * 2][];
+			this.scores = initArray(maxStrokes*2);
+			for(var i=0; i<this.scores.length; i++)
+			{
+				this.scores[i] = initArray(maxStrokes * 2);
+			}
+			//init drawn on Point
+			this.a.initDrawn(maxStrokes);
+			this.b.initDrawn(maxStrokes);
+	}
+	
+	
+	Pair.prototype.score = function(availablePoints){
+		this.pointCount = availablePoints.length;
+		this.maxBScore = -1;
+		this.maxAScore = -1;
+		// Get max B score
+		for(var bIndex = 0; bIndex < this.pointCount; bIndex++)
+		{
+			var bScore = this.b.score[bIndex];
+			if(bScore > this.maxBScore){
+				maxBScore = bScore;
+			}
+		}
+		for(var aIndex=0; aIndex < this.pointCount; aIndex++){
+				// Track max A score
+			var aScore = this.a.score[aIndex];
+				
+			if(aScore > this.maxAScore){
+				this.maxAScore = aScore;
+			}
+				
+			var aPair = availablePoints[aIndex].pair;
+			var wrongDirection = aPair.a != availablePoints[aIndex];
+			for(var bIndex=0; bIndex < this.pointCount; bIndex++){
+				var bScore = this.b.score[bIndex];
+				if(bIndex==aIndex){
+					continue;
+				}
+				// Basic score is sum of individual scores
+				var score = aScore + bScore;
+				
+				if(aPair != availablePoints[bIndex].pair){
+					score *= FuzzyComparer.SCOREMULTI_NOT_PAIR;
+				}else if(wrongDirection){
+					score *= FuzzyComparer.SCOREMULTI_WRONG_DIRECTION;
+				}
+				
+				this.scores[aIndex][bIndex] = score;
+			}
+		}
+		this.bestScore = -1;
+	}
+	
+	Pair.prototype.scoreAvailable= function(otherPoints, mustBeOver){
+			// If it hasn't changed since last time, do nothing
+			if(this.bestScore > 0)
+			{
+				return;
+			}
+			// If we can't possibly achieve a better score than the current best,
+			// return
+			if(this.maxAScore + this.maxBScore < mustBeOver)
+			{
+				return;
+			}
+			// Consider all combinations of point A and B
+			this.bestScore = -1;
+//			int loopCount = 0;
+			for(var aIndex=0; aIndex < this.pointCount; aIndex++)
+			{
+				var aScore = this.a.sortedScore[aIndex];
+				var aPointIndex = aScore.index;
+				if(aScore.score + this.maxBScore < mustBeOver
+					|| otherPoints[aPointIndex] == null)
+				{
+					// If A score + any B score can't beat min score, then continue, or
+					// also if point is done
+					continue;
+				}
+				var correspondingScores = this.scores[aPointIndex];
+				for(var bIndex=0; bIndex < this.pointCount; bIndex++)
+				{
+					var bScore = this.b.sortedScore[bIndex];
+					var bPointIndex = bScore.index;
+					if(bPointIndex == aPointIndex || otherPoints[bPointIndex]==null)
+					{
+						continue;
+					}
+//					loopCount++;
+					// Basic score is sum of individual scores
+					var score = correspondingScores[bPointIndex];
+					// Is this best?
+					if(score > this.bestScore)
+					{
+						this.bestScore = score;
+						bestAIndex = aPointIndex;
+						bestBIndex = bPointIndex;
+						if(this.bestScore > mustBeOver)
+						{
+							mustBeOver = this.bestScore;
+						}
+					}
+				}
+			}
+//			System.err.println(loopCount + "/" + (pointCount * pointCount));
+	}
+	
+	
+	var Point = function(x ,y){
+		this.xLess = 0;
+		this.xMore = 0;
+		this.xSimilar = 0; 
+		this.yLess = 0; 
+		this.yMore = 0;
+		this.ySimilar = 0;
+		this.pair;
+		this.score = [];
+		this.sortedScore = [], preSortedScore = [];// Type of array is ScoreAndIndex
+		this.best = [FuzzyComparer.BEST_SCORES_SORT_FIRST];
+	
+		this.x = Math.round((x + 0.5) * 255);
+		this.y = Math.round((y + 0.5) * 255);	
+		
+	}
+	
+	Point.SIMILAR_RANGE = 13;
+	
+	Point.prototype.setPair = function(pair){
+		this.pair = pair;
+	}
+	
+	Point.prototype.count = function(allPoints){
+		savePointScope = this;
+		allPoints.forEach( function(point) {
+			if(!(point.x == savePointScope.x && point.y == savePointScope.y) ){
+					if(point.x < savePointScope.x - Point.SIMILAR_RANGE)
+					{
+						savePointScope.xLess++;
+					}
+					else if(point.x > savePointScope.x + Point.SIMILAR_RANGE)
+					{
+						savePointScope.xMore++;
+					}
+					else
+					{
+						savePointScope.xSimilar++;
+					}
+					if(point.y < savePointScope.y - Point.SIMILAR_RANGE)
+					{
+						savePointScope.yLess++;
+					}
+					else if(point.y > savePointScope.y + Point.SIMILAR_RANGE)
+					{
+						savePointScope.yMore++;
+					}
+					else
+					{
+						savePointScope.ySimilar++;
+					}
+			}
+		
+		});
+	}
+	
+	Point.prototype.initDrawn = function(maxStrokes){
+		this.score = initArray(maxStrokes * 2);
+		this.sortedScore = initArray(maxStrokes * 2);
+		this.preSortedScore = initArray(maxStrokes * 2 + 1);
+		
+		for(var i = 0; i < maxStrokes * 2; i++){
+			this.preSortedScore[i] = new ScoreAndIndex();
+		}
+		// Dummy score to use for 'best' marker
+		this.preSortedScore[maxStrokes * 2] = new ScoreAndIndex();
+	}
+	
+	Point.prototype.scoree = function( otherPoints, maxScore){
+		//console.log(this.best);
+		for(var i = 0;i < FuzzyComparer.BEST_SCORES_SORT_FIRST; i++){
+			this.best[i] = this.preSortedScore.length-1;
+		}
+		var worstBestScore = 0;
+		for(var i = 0; i < otherPoints.length;i++){
+			var other = otherPoints[i];
+			
+			var difference = Math.abs(this.xLess - other.xLess)
+			+ Math.abs(this.xMore - other.xMore) + Math.abs(this.xSimilar - other.xSimilar)
+			+ Math.abs(this.yLess - other.yLess) + Math.abs(this.yMore - other.yMore)
+			+ Math.abs(this.ySimilar - other.ySimilar);
+			
+			var thisScore = maxScore - difference;
+			this.preSortedScore[i].index = i;
+			this.preSortedScore[i].score = thisScore;
+			this.preSortedScore[i].used = false;
+			this.score[i] = thisScore;
+				
+			if(thisScore >= worstBestScore){
+				var bestIndex = 0;
+				for(; bestIndex < FuzzyComparer.BEST_SCORES_SORT_FIRST-1; bestIndex++){
+					if(thisScore > this.preSortedScore[this.best[bestIndex]].score){
+							break;
+					}
+				}
+				//to do next
+				for(var moveIndex = FuzzyComparer.BEST_SCORES_SORT_FIRST-1; moveIndex>bestIndex; moveIndex-- ){
+					this.best[moveIndex] = this.best[moveIndex-1];
+				}
+				this.best[bestIndex] = i;
+				if(bestIndex == FuzzyComparer.BEST_SCORES_SORT_FIRST-1){
+					worstBestScore = thisScore;
+				}
+			}
+		}
+		
+		for(var i=0; i< FuzzyComparer.BEST_SCORES_SORT_FIRST; i++){
+			this.sortedScore[i] = this.preSortedScore[this.best[i]];
+			this.preSortedScore[this.best[i]].used = true;
+		}
+		
+		var index = FuzzyComparer.BEST_SCORES_SORT_FIRST;
+		for(var i=0; i< otherPoints.length; i++){
+			if(!this.preSortedScore[i].used){
+				this.sortedScore[index++] = this.preSortedScore[i];
+			}
+		}
+	}
+	
+	var ScoreAndIndex = function() {
+		this.score = 0; 
+		this.index = 0;
+		this.used = false;	
+	}
+	
+	ScoreAndIndex.prototype.compareTo = function(o){
+		if(o.score > this.score){
+			return 1;
+		}else if(o.score < this.score){
+			return -1;
+		}else{
+			return index - o.index;
+		}
+	}
+	
+	 ScoreAndIndex.prototype.toString = function(){
+		return Integer.toString(this.score);
+	}
+	
+	FuzzyComparer.convertKanjiInfo = function(info){
+		result = new initArray(info.getStrokeCount()); //array of pair
+		for(var i=0; i<result.length; i++)
+		{
+			var stroke = info.getStroke(i);
+			result[i] = new Pair(
+				new Point(stroke._startX, stroke._startY),
+				new Point(stroke._endX, stroke._endY));
+		}
+		result.forEach(function(pair) {
+			pair.a.setPair(pair);
+			pair.b.setPair(pair);
+			pair.b.setPair(pair);
+		});
+		return result;
+	}
+	
+	FuzzyComparer.getPairPoints = function(pairs){
+		result = initArray(pairs.length * 2);
+		var out = 0;
+		for(var i = 0; i < pairs.length; i++){
+			result[out++] = pairs[i].a;
+			result[out++] = pairs[i].b;
+		}
+		result.forEach(function (point)
+		{
+			point.count(result);
+		});
+		
+		return result;
+	}
+	
+	FuzzyComparer.prototype.getMatchScore = function(other){
+		// Get data from match kanji
+		var otherPairs = FuzzyComparer.convertKanjiInfo(other);
+		var otherPoints = FuzzyComparer.getPairPoints(otherPairs);
+		// Max difference is (less than) the highest number of strokes *
+		// 6 facets.
+		var maxScore = Math.max(this.drawnPoints.length, otherPoints.length) * 6;
+		// Score all points against all points; O(points^2)
+		this.drawnPoints.forEach( 
+			function(point){
+				//point.__proto__.score(otherPoints, maxScore);
+				point.scoree(otherPoints, maxScore);
+			}
+		);
+		// Score all pairs
+		this.drawnPairs.forEach( 
+			function(pair) {
+				
+				pair.score(otherPoints);
+			}
+		);
+		
+		// Copy source pairs into list of remaining ones
+		//next from here
+		var remainingPairs = initArray(this.drawnPairs.length);
+		
+		//This was "System.arraycopy(drawnPairs, 0, remainingPairs, 0, remainingPairs.length);"
+		for(var i = 0; i < remainingPairs.length; i++){
+			remainingPairs[i] = this.drawnPairs[i];
+		}
+		
+		// How many remaining things to match?
+		var pairsLeft = remainingPairs.length;
+		var pointsLeft = otherPoints.length;
+		var totalScore = 0;
+		while(pointsLeft > 0 && pairsLeft > 0)
+		{
+			// Score all pairs to find best match
+			var bestPairIndex = -1;
+			var bestPair = null;
+			var bestPairScore = -1;
+			for(var i=0; i<remainingPairs.length; i++)
+			{
+				var pair = remainingPairs[i];
+				if(pair == null)
+				{
+					continue;
+				}
+				pair.scoreAvailable(otherPoints, bestPairScore);
+				if(pair.bestScore > bestPairScore)
+				{
+					bestPair = pair;
+					bestPairIndex = i;
+					bestPairScore = pair.bestScore;
+				}
+			}
+			// Eat that pair and its points, and add to total score
+			remainingPairs[bestPairIndex] = null;
+			var aIndex = bestPair.bestAIndex, bIndex = bestPair.bestBIndex;
+			otherPoints[aIndex] = null;
+			otherPoints[bIndex] = null;
+			totalScore += bestPairScore;
+			pairsLeft--;
+			pointsLeft-=2;
+		}
+		// Scale score (it is now up to 2 * max * number of pairs matched)
+		totalScore /= 2 * maxScore * (this.drawnPairs.length - pairsLeft);
+		// Return as percentage
+		return totalScore * 100;
+	}
+	
+	function initArray(size){
+		var array = [];
+		for(var i = 0; i< size;i++){
+			array.push(null);
+		}
+		return array;
+	}
+	
+	
+	//begin testing kanji
+	/*potentialKanji.clearStroke();
+	potentialKanji.addStroke(new InputStroke(50, 50, 150, 50));
+	potentialKanji.normaliseStroke();
+	potentialKanji.findDirections();
+	var fuzzy = new FuzzyComparer(potentialKanji);*/
+	
+	 
+	/*var testKanji2 = new KanjiInfo("?");
+	testKanji2.addStroke(new InputStroke(50, 50, 150, 50));
+	testKanji2.normaliseStroke();
+	testKanji2.findDirections();*/
+	//console.log("The fuzzy score is " + fuzzy.getMatchScore(testKanji2));
+	
+
+		
+	//begin comparing process;
+	/*var strokeCount = potentialKanji.strokes.length; 
+		 
+	if(kanjiList[strokeCount]  == null){	
+		console.log('how can there be a kanji with more than 30 strokes -*-');
+	}else{
+		//map = new Map();
+		//potentialKanji.printLoadingStroke();
+		var kanjiWithSameStroke = kanjiList[strokeCount];
+    	var kanjiRanking = [];
+			
+		for(var i = 0; i < kanjiWithSameStroke.length; i++){
+		    var score = fuzzy.getMatchScore(kanjiWithSameStroke[i]);
+			//map.set(score, kanjiWithSameStroke[i].kanji);	
+			if(score > 80){
+				results.push(new Result(kanjiWithSameStroke[i].kanji, score));
+			}
+		}
+		results = sortResult(results);
+		console.log(results);		
+	} */
+	
+	
+</script>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+	<meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-eval' 'unsafe-inline'; img-src 'self' data:" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+	<meta http-equiv="Content-Security-Policy" content="default-src *; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'; img-src * data: 'unsafe-inline'; connect-src * 'unsafe-inline'; child-src *;" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <!-- Good default declaration:
+    * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+    * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+    * Disables use of eval() and inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+        * Enable inline JS: add 'unsafe-inline' to default-src
+        * Enable eval(): add 'unsafe-eval' to default-src
+    * Create your own at http://cspisawesome.com
+    -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+
+
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+	<!--boostrap include00-->
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+	<!-- must load jquery before bootstrap.mis.js -->
+	<script src="js/jquery.min.js"></script>
+	<script src = "js/bootstrap.min.js"></script>
+	<!-- drawingboard.js requirement-->
+	
+    <title>Hello World</title>
+</head>
+
+<!-- the size of the board some how effects whether or not on start drawing works -->
+<style>
+ 
+	.header-inwrap {
+		max-width: 1264px;
+		padding: 0px 32px;
+		margin: 0px auto;
+		background: lightblue;
+	}
+	
+	.site-title {
+		font-size: 36px;
+		font-weight: 700;
+		line-height: 1;
+		margin: 0;
+		padding: 6px 0px 0px 0px;
+	}
+
+	.site-description {
+		font: 300 normal 13px "Open Sans", Helvetica, sans-serif;
+		margin: 0;
+		padding: 4px 0px 0px 0px;
+	}
+	
+	#pagebody{
+		padding-top: 48px;
+	}
+	
+</style>
+
+<body>
+
+	<div class = "header-inwrap">
+		<h1 class = "site-title">Kanji App</h1>
+		<h2 class = "site-description">Reminder List </h2>
+	</div>
+	
+     <!--<div id = "list"></div>-->
+	<div id = "pagebody" class = "container">
+		<div class = "row">
+			<div class = "col-sm-5"> 
+				<button class ="btn btn-default" onclick="clickk()">Remove</button>
+			</div>
+		</div>
+		
+		<div style = "height: 5px;"></div>
+		
+		<div class = "well">
+			<font id = "title" style = "font-family: 'Enriqueta', arial, serif; font-size: 16px" > Yet to do </font>
+			<div style = "height: 10px;"></div>
+			<div id="" style="overflow-y: scroll; overflow-x: hidden; height: 300px; background-color: white">
+			
+			<div class = "row">
+				<div class = "col-sm-1"> 
+					
+					<div class="checkbox" style = "padding-left: 10px">
+						<label><input type="checkbox" value=""></label>
+					</div>
+				</div>
+				<div class = "col-sm-3"> 		<!--glyphicon glyphicon-remove-->
+					<h5>  <font style = "color: red;"> &#10006 </font> get this done</h5>
+					
+				</div>
+			</div>
+			
+			<div class = "row">
+				<div class = "col-sm-1"> 			
+					<div class="checkbox" style = "padding-left: 10px">
+						<label><input type="checkbox" value="" checked></label>
+					</div>
+				</div>
+				<div class = "col-sm-3"> 		<!--glyphicon glyphicon-remove-->
+					<h5> <font style = "color: green;"> &#10004 </font> get this done </h5>
+					
+				</div>
+					
+			</div>
+					
+			</div>
+			<div style = "height: 10px;"></div>
+			
+			<div class = "row">
+		
+				<div class = "col-sm-3"> 			
+					<input id = "output" class = "form-control output"> </input>	
+				</div>
+				<button class ="btn btn-default" onclick="clickk()">Add</button>
+			</div>
+		
+		</div>
+	</div>
+		
+</body>
+
+<script>
+	//localStorage.setItem("lastname", "Smith");
+	function clearSaveItem(){
+		localStorage.removeItem("test");
+	}
+	
+	var ReminderList = function(text){
+		this.status = false;
+		this.text = text;
+	}
+	
+	ReminderList.prototype.changeStatus = function(){
+		//change to opposite status
+		this.status = !status;  
+	}
+	
+	function removeReminder(reminder){
+		for(var i = 0;i < reminder; i++){
+			//to do later remove from array test
+			//if(reminder){
+			//}
+		}
+	}
+	
+	var results;
+	var json = localStorage.getItem("test");
+	
+	if(json == null){
+		results = [];
+	}else{
+		results = JSON.parse(json);
+	}
+
+	results.push(new Result("asda",1));
+	
+	json = JSON.stringify(results); 
+	console.log(results);
+	
+	localStorage.setItem("test", json);
+	
+	
+</script>
+</html>

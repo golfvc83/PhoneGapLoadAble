@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<style  type="text/css">
+html {
+	margin: 0;
+	padding: 0;
+    filter: grayscale(100%);
+    -moz-filter: grayscale(100%);
+    -webkit-filter: grayscale(100%);
+    filter: gray; /* IE6-9 */
+}
+</style>
+<title>SVG test</title>
+<header></header>
+<body style = "background: #e3e3e3;">
+<p>kore ga ni desu</p>
+
+<!--<svg id = "svg_pane" xmlns="http://www.w3.org/2000/svg" style = "border: 1px solid; width: 109px; height: 109px;">-->
+<svg id = "svg_pane" xmlns="http://www.w3.org/2000/svg" style = "border: 1px solid; width: 218px; height: 218px;">
+      <!--   <path d="M25.25,32.4c1.77,0.37,4.78,0.56,6.55,0.37c10.82-1.15,28.82-3.4,41.24-3.76c2.95-0.09,4.73,0.18,6.21,0.36
+M12,80.75c2.37,0.5,6.73,0.67,9.09,0.5c23.79-1.75,45.04-4.12,67.49-4.74c3.95-0.11,6.32,0.24,8.3,0.49 "></path>-->
+</svg>
+
+<div id="page-wrapper" style = "display:inline;">
+<span>2008 file</span>
+<svg id = "svg_pane2" xmlns="http://www.w3.org/2000/svg" style = "border: 1px solid; width: 218px; height: 218px;">
+	<path d= "M13,33c0.88,0.88,2.75,1.82,5.25,1.75c8.62-0.25,20-2.12,29.5-4.25c1.51-0.34,4.62-0.88,6.62-0.5 M31.75,17.62c0.88,1,1.82,3.26,1.38,5.25C29.38,39.62,26.88,61,28,76.5c0.41,5.7,1.88,10.88,3.38,13.62 M47.62,44.12c0.75,1.12,1.16,4.39,0.5,6.12C43.5,62.5,36.88,74,22.75,86c-6.86,5.83-15.88,3.75-16.25-8.38C6.16,66.75,19.88,54.5,38.88,50.88c12.42-2.37,27,1.38,30.5,12.75C73.43,76.81,65.62,90,48.5,94.12" ></path>
+</svg>
+</div>
+
+<div id="page-wrapper" style = "display:inline;">
+<span>2016 file</span>
+<svg id = "svg_pane2" xmlns="http://www.w3.org/2000/svg" style = "border: 1px solid; width: 218px; height: 218px;">
+	<path d= "" ></path>
+</svg>
+</div>
+
+<div id="page-wrapper" style = "display:in-line">
+
+    <h1>Text File Reader</h1>
+    <div>
+      Select a text file: 
+      <input type="file" id="fileInput">
+    </div>
+     <pre id="fileDisplayArea"></pre>
+</div>
+
+<script>
+var person = {
+    firstName:"John",
+    lastName:"Doe",
+    age:50,
+    eyeColor:"blue"
+};
+
+function splitStrokeByComma(stringStrokeInfo){
+	var splitArray = stringStrokeInfo.split(','); 
+    return splitArray;
+	/*var splitArray = [];
+	var tempVariable = '';
+	for(var i = 0; i<stringStrokeInfo.length;i++){
+		//if starts with letter - add temp to splitArray, clear temp 
+		if(stringStrokeInfo[i] == ','){
+			splitArray.push(tempVariable);
+			tempVariable = '';
+			//else if comma	
+		}else if(stringStrokeInfo[i]=='M' || stringStrokeInfo[i]=='c'){
+			if(tempVariable.length > 0){
+				splitArray.push(tempVariable);
+			}
+			tempVariable = stringStrokeInfo[i];
+		//keep adding to temp
+		}else{
+		  tempVariable = tempVariable + stringStrokeInfo[i];
+		} 
+	}
+	return splitArray;*/
+}
+
+function combindStroke(arrayStrokeInfo){
+    var stringStrokeInfo = '';
+    for(var i = 0; i < arrayStrokeInfo.length; i++){
+		if (i != arrayStrokeInfo.length - 1) {
+			stringStrokeInfo = stringStrokeInfo + arrayStrokeInfo[i]+','; 
+		} else {
+			stringStrokeInfo = arrayStrokeInfo[i]; 
+		}
+	}
+	return stringStrokeInfo;
+}
+//M25.25,32.4c1.77,0.37,4.78,0.56,6.55,0.37c10.82-1.15,28.82-3.4,41.24-3.76c2.95-0.09,4.73,0.18,6.21,0.36
+//M12,80.75c2.37,0.5,6.73,0.67,9.09,0.5c23.79-1.75,45.04-4.12,67.49-4.74c3.95-0.11,6.32,0.24,8.3,0.49 
+function changeSizeStrokeByProportion(proportion, arrayStrokeInfo){
+    var tempNum = '';
+	var currentNewStroke = '';
+	
+	for(var i = 0; i < arrayStrokeInfo.length; i++){
+		for(var f = 0; f < arrayStrokeInfo[i].length; f++){
+			if(arrayStrokeInfo[i].charAt(f) == 'M' || arrayStrokeInfo[i].charAt(f) =='c' || arrayStrokeInfo[i].charAt(f) == '-' 
+				||(	f == arrayStrokeInfo[i].length-1) ){	
+				
+				if(tempNum.length > 0){
+					if(	f == arrayStrokeInfo[i].length-1){
+						tempNum = tempNum + arrayStrokeInfo[i].charAt(f);	
+					}
+					
+					tempNum = parseFloat(tempNum) * proportion;
+					currentNewStroke = currentNewStroke + tempNum.toString();
+					tempNum = '';
+				
+				
+				}
+				if(	f != arrayStrokeInfo[i].length-1){
+					currentNewStroke = currentNewStroke+ arrayStrokeInfo[i].charAt(f); 
+				}
+			}else{
+				tempNum = tempNum + arrayStrokeInfo[i].charAt(f);
+
+			}
+		}	
+		arrayStrokeInfo[i] = currentNewStroke;
+		currentNewStroke = '';
+	}
+	return arrayStrokeInfo;
+}
+
+var stroke = [];
+//M62.13,31.68c0.72-7.08-1.59-16.47-16.91-16.47c-15.32,0-35.69,12.14-35.69,30.49c0,11.13,10.8,14.63,16.44,14.63s26.81-3.31,34.65-23.31//c2.89-7.37,8.98-19.31,3.32-5.2C55.77,52.2,43.82,80.76,39.2,92.61
+
+
+var stroke1 = 'M25.25,32.4c1.77,0.37,4.78,0.56,6.55,0.37c10.82-1.15,28.82-3.4,41.24-3.76c2.95-0.09,4.73,0.18,6.21,0.36'
+var stroke2 = 'M12,80.75c2.37,0.5,6.73,0.67,9.09,0.5c23.79-1.75,45.04-4.12,67.49-4.74c3.95-0.11,6.32,0.24,8.3,0.49'
+//var finalstroke = stroke1 +' '+ stroke2;
+
+var strokeArray1 = splitStrokeByComma(stroke1);
+var strokeArray2 = splitStrokeByComma(stroke2);
+
+strokeArray1 = changeSizeStrokeByProportion(2, strokeArray1);
+strokeArray2 = changeSizeStrokeByProportion(2, strokeArray2);
+
+var finalstroke = strokeArray1 +' '+ strokeArray2;
+alert(finalstroke);
+
+//var svg = document.createElement("svg");
+//var path = document.createElement("path");
+var path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+path.setAttribute("d", finalstroke);
+document.getElementById("svg_pane").appendChild(path);
+//document.getElementById("path").setAttribute("d", finalstroke);
+//svg.setAttribute("xmlns","http://www.w3.org/2000/svg");
+//svg.setAttribute("stye", "border: 1px solid; width: 109px; height: 109px;");
+//svg.appendChild(path);
+//var p = document.createElement("p");
+//p.innerHTML = "gg";
+//document.body.appendChild(svg);
+//document.body.appendChild(p);
+
+
+var SIZE = {
+  SMALL : {value: 0, name: "Small", code: "S"}, 
+  MEDIUM: {value: 1, name: "Medium", code: "M"}, 
+  LARGE : {value: 2, name: "Large", code: "L"}
+};
+
+Object.freeze(SIZE);
+
+var Human = function(name,size){
+	this.size = size
+	this.name = name
+}
+
+Human.prototype.compareSize = function(anotherHuman){
+	return this.size == anotherHuman.size;
+}
+
+Human.prototype.getSize = function(){
+	return this.size.name;
+}
+
+window.onload = function() {
+    var fileInput = document.getElementById('fileInput');
+    var fileDisplayArea = document.getElementById('fileDisplayArea');
+
+    fileInput.addEventListener('change', function(e) {
+      // Put the rest of the demo code here.
+	  //fileDisplayArea.innerText = fileInput.result;
+	fileDisplayArea.innerText = 'umhahaha';
+	parser = new DOMParser();
+	xmlDoc = parser.parseFromString(fileInput, "text/xml");
+	}); 
+	
+	var golf = new Human('golf',SIZE.LARGE);
+	var pJew = new 	Human('jew',SIZE.LARGE);
+	console.log(golf.compareSize(pJew));
+	console.log(golf.getSize())
+}
+
+</script>
+</body>
+</html>
+<!--<!DOCTYPE html>
+
+<html>
+<body>
+
+<p id="demo"></p>
+
+<script>
+var parser, xmlDoc;
+var text = "<bookstore><book>" +
+"<title>Everyday Italian</title>" +
+"<author>Giada De Laurentiis</author>" +
+"<year>2005</year>" +
+"</book></bookstore>";
+
+if (window.DOMParser) {
+  parser = new DOMParser();
+  xmlDoc = parser.parseFromString(text,"text/xml");
+} else {
+  xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+  xmlDoc.async = false;
+  xmlDoc.loadXML(text);
+}
+
+document.getElementById("demo").innerHTML =
+xmlDoc.getElementsByTagName("title")[0].childNodes[0].nodeValue;
+
+var all = xmlDoc.getElementsByTagName("*");
+
+var text = '';
+for (var i=0, max=all.length; i < max; i++) {
+     // Do something with the element here 
+     alert(all[i]);
+     text = text + all[i].nodeValue;
+}
+document.getElementById("demo").innerHTML = text;
+
+</script>
+
+</body>
+</html>
+
+-->

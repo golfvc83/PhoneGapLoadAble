@@ -24,6 +24,7 @@
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
 	<!-- must load jquery before bootstrap.mis.js -->
 	<script src="js/jquery.min.js"></script>
+	<script src="js/jquery.textfill.min.js"></script>
 	<script src = "js/bootstrap.min.js"></script>
 	<script src="js/mustache.min.js"></script>
 	<!-- drawingboard.js requirement-->
@@ -34,13 +35,9 @@
 <!-- the size of the board some how effects whether or not on start drawing works -->
 <style>
  
-	.header-inwrap {
-		max-width: 1264px;
-		padding: 0px 32px;
-		margin: 0px auto;
-		background: lightblue;
-	}
+	@font-face { font-family: kanji; src: url('KanjiStrokeOrders_v4.000.ttf'); } 
 	
+
 	.site-title {
 		font-size: 36px;
 		font-weight: 700;
@@ -56,14 +53,20 @@
 	}
 	
 	#pagebody{
-		padding-top: 48px;
+		padding-top: 30px;
 	}
 	
-	.headerItem{
+	@media (max-width:360px){.headerItem{
+		color: #f5f5ef;	
+		font-size: 14px;	
+		padding: 10px;
+	}}
+	
+	@media (min-width:360px){.headerItem{
 		color: #f5f5ef;	
 		font-size: 24px;
 		padding: 20px;
-	}
+	}}
 	
 	span.glyphicon {
 		font-size: 0.95em;
@@ -71,89 +74,117 @@
 	
 	.headerItem:hover{   
 		text-decoration: none;
-		color: black;
-		
+		color: black;	
 	}
 	
 	.shadow{
 		box-shadow: 3px 0px 5px #2e2e1f; overflow: hidden;
 	}
 	
+	.kanjiListPanel{
+		font-family: kanji; 
+	}
+	
+	.resultPanel{
+		background-color: white;
+		border-style:solid; border-color:lightgrey;
+		border-width: 1px;	
+		text-align:center;	
+	}
+	
+	@media (max-width:768px){#buttomButtonsPanel
+		{
+			padding-top: 5px;
+		}
+	}
+	
+	@media (max-width:360px){#addButton
+		{
+			padding-top: 5px;
+		}
+	}
+	
+	
+	@media (max-width:360px){#strict1, #list
+		{
+			height: 150px;
+		}
+	}
+	
+	@media (min-width:361px){#strict1, #list
+		{
+			height: 400px;
+		}
+	}
+	
+	.itemList{	
+		border-bottom:solid; 
+		border-color:lightgrey;
+		border-width: 1px;
+	}
+	
+	.unselectable {
+		-moz-user-select: -moz-none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+	}
+	
 	
 </style>
 
-<body onbeforeunload = "saveList()" style = "background-color: grey">
-		<div id = "header">
-			<div class = "shadow" style = "background-color: #6b6b47; width:100%;">
-				<ul>
-					<il><a class = "headerItem" href = ""> <span class = "glyphicon glyphicon-home"></span></a></il>
-					<il><a class = "headerItem" href = "index.html" >Kanji App</a></il>
-					<il><a class = "headerItem" href = "ReminderList.html">Reminder List</a></il>
-					<il class = "headerItem" ><span class = "glyphicon glyphicon-question-sign" onclick = 'welcomeNote()'></span></il>
-				</ul>
-			</div>
-		</div>
-     <!--<div id = "list"></div>-->
-	<div id = "pagebody" class = "container">
-		
-	
 
+<body onbeforeunload = "saveList()" style = "background-color: grey">
+	<div id = "header">
+		<div class = "shadow" style = "background-color: #6b6b47; width:100%; position: fixed; z-index: 999; margin-top 100%; top: 0;">
+			<ul>
+				<il><a class = "headerItem" href = ""> <span class = "glyphicon glyphicon-home"></span></a></il>
+				<il><a class = "headerItem" href = "index.html" >Kanji App</a></il>
+				<il><a class = "headerItem" href = "KanjiReminderList.html">Reminder List</a></il>
+				<il class = "headerItem" ><span class = "glyphicon glyphicon-question-sign" onclick = 'welcomeNote()'></span></il>
+			</ul>
+		</div>
+	</div>
+
+	<div id = "pagebody" class = "container" style = "margin-top: 30px; height: 100%; position: relative; z-index: 99;">
+		
 		<div class = "well shadow">
 		
-		<div class = "row">
-			<div class = "col-sm-5"> 
-				<button class ="btn btn-default" onclick="markAll()">Mark All</button> 
-				<button class ="btn btn-default" onclick="remove()">Remove</button>
+			<div class = "row">
+				<div class = "col-sm-5"> 
+					<button class ="btn btn-default" onclick="markAll()">Mark All</button> 
+					<button class ="btn btn-default" onclick="remove()">Remove</button>
+				</div>
 			</div>
-		</div>
-		
-		<div style = "height: 5px;"></div>
+			<div class = "row">
+				<div class = "col-lg-2 col-xs-12"> 
+					<div style = "height: 5px;"></div>
+					
+					<div style = "height: 10px;"></div>
+					<div id="list" class = "resultPanel" style="overflow-y: scroll; overflow-x: hidden; background-color: white;"></div>
+				</div>
+				<div class = "col-lg-10 col-xs-12"> 
+					<div style = "height: 10px;"></div>
+					<div id = "strict1" class = "resultPanel"><span class = "kanjiListPanel" style = "visibility:hidden">業</span></div> 
+				</div>
 				
-			<div style = "height: 10px;"></div>
-			<div id="list" style="overflow-y: scroll; overflow-x: hidden; height: 400px; background-color: white">
+			</div>
 			
+			
+			<div style = "height: 10px;"></div>
+				
 			<!--<div class = "row">
-				<div class = "col-sm-1"> 
-					
-					<div class="checkbox" style = "padding-left: 10px">
-						<label><input type="checkbox" value=""></label>
-					</div>
-				</div>
-				<div class = "col-sm-3"> 		
-					<h5>  <font style = "color: red;"> &#10006 </font> get this done</h5>
-					
-				</div>
-			</div>
-			
-			<div class = "row">
-				<div class = "col-sm-1"> 			
-					<div class="checkbox" style = "padding-left: 10px">
-						<label><input type="checkbox" value="" checked></label>
-					</div>
-				</div>
-				<div class = "col-sm-3"> 		
-					<h5> <font style = "color: green;"> &#10004 </font> get this done </h5>
-					
-				</div>
-					
-			</div>-->
-					
-			</div>
-			<div style = "height: 10px;"></div>
-			
-			<div class = "row">
-		
-				<div class = "col-sm-7"> 			
-					<input id = "output" rows="5" class = "form-control output"> </input>						
+				<div class = "col-lg-6 col-xs-12">
+					<input id = "output" rows="5" class = "form-control output"> </input>	
 				</div>
 				
-				<button id = "switchText" class ="btn btn-default" 
-				onclick="switchText()">Switch to Text Area</button>
-				
-				<button class ="btn btn-default" onclick="addList()">Add</button>
+				<div id = "buttomButtonsPanel" class = "col-lg-6 col-xs-12">	
+					<button id = "switchText" class ="btn btn-default" onclick="switchText()">Switch to Text Area</button>
+					<button id = "addButton" class ="btn btn-default" onclick="addList()">Add</button>
+				</div>
 			</div>
-			
-			<!--<script id="templateUnmarked" type="x-tmpl-mustache">
+			<script id="templateUnmarked" type="x-tmpl-mustache">
 				<div class = "row">
 					<div class = "col-sm-1"> 
 						<div class="checkbox" style = "padding-left: 10px" >
@@ -181,23 +212,29 @@
 			
 		</div>
 	</div>
-		
+	<div onclick="doubleclick(this)">click me</div>
+    
 </body>
 
-<script src="header.js"></script>
+<script src="header.js"></script>	
 <script>
-	//localStorage.setItem("lastname", "Smith");
 	
-	/*<div class = "row">
-		<div class = "col-sm-1"> 
-			<div class="checkbox" style = "padding-left: 10px">
-				<label><input type="checkbox" value=""></label>
-			</div>
-		</div>
-		<div class = "col-sm-3"> 		
-			<h5>  <font style = "color: red;"> &#10006 </font> get this done</h5>		
-		</div>
-	</div>*/
+	//var touchtime = 0;
+	var clicks = 0;
+	function doubleclick(e) {
+		clicks++;
+		if (clicks == 1) {
+			setTimeout(function(){
+				if(clicks == 1) {
+					goToCanvas(e);
+				} else {
+					goToKanjiApp(e);
+				}
+					clicks = 0;
+				}, 300);
+		}
+    }
+	
 	
 	var HTML_ROW = "";
 	
@@ -205,13 +242,14 @@
 		alert('Welcome to ReminderList programe, try adding something to the textbox below, then click Add.');
 	}
 	function clearSaveItem(){
-		localStorage.removeItem("list");
+		localStorage.removeItem("KanjiList");
 	}
 	
 	var reminderList = [];
 	var templateUnmarked;
 	var templateMarked;
-		
+
+	
 	var ReminderItem = function(status, text){
 		this.status = status; //false is not marked
 		this.text = text;
@@ -224,7 +262,7 @@
 	
 	function removeReminder(reminder){
 		for(var i = 0;i < reminder; i++){
-			//to do later remove from array test
+		
 			if(reminder[i].status){
 				reminder[i] = null;
 			}
@@ -234,9 +272,20 @@
 	
 	window.onload = initPage;
 	
-	assignTemplate = function assignTemplate(){
+	window.addEventListener('resize', resizeKanji);
+	function resizeKanji(){
+		$('#strict1').textfill({
+			maxFontPixels: 1000
+		});
 		
-		var json = localStorage.getItem("list");
+		$('#strict1Small').textfill({
+			maxFontPixels: 1000
+		});
+	}
+	
+	assignTemplate = function assignTemplate(){
+		resizeKanji();
+		var json = localStorage.getItem("KanjiList");
 		
 		templateUnmarked = document.getElementById('templateUnmarked').innerHTML;
 		templateMarked = document.getElementById('templateMarked').innerHTML;
@@ -247,16 +296,19 @@
 		}else{
 			
 			reminderList = JSON.parse(json);
-			var htmlList = $('#list');
+			//var htmlList = $('#list');
+			
 			for(var i = 0 ; i< reminderList.length; i++){
 				var rendered;
 				if(!reminderList[i].status){
-					rendered = Mustache.render(templateUnmarked, {message: reminderList[i].text});
+					rendered = Mustache.render(templateUnmarked, {rownum: i, message: reminderList[i].text});
 				}else{
-					rendered = Mustache.render(templateMarked, {message: reminderList[i].text});
+					rendered = Mustache.render(templateMarked, {rownum: i, message: reminderList[i].text});
 				}
 				
 				$('#list').append(rendered);
+				//$('#smallList').append(rendered);
+				
 			}
 			
 		}
@@ -267,6 +319,35 @@
 
 		loadTemplate("template.html" , assignTemplate);
 
+	}
+	
+	var currentlySelectItem = null;
+	
+	function goToCanvas(e){
+		//e.style.backgroundColor = '#7a8787';
+		if(currentlySelectItem != null){
+			currentlySelectItem.style.backgroundColor = '';
+		}else{
+			$('.kanjiListPanel')[0].style.visibility = '';
+		}
+		$('.kanjiListPanel')[0].innerHTML = e.children[1].children[0].childNodes[2].nodeValue; 
+		e.style.backgroundColor = '#7a8787';
+		currentlySelectItem = e;
+		currentRowNum = e.getAttribute("rownum");
+	}
+	
+	var KanjiItem = function(kanji, rownum){
+		this.kanji  = kanji; 
+		this.rownum = rownum;
+	}
+	
+	function goToKanjiApp(e){
+		//saveList();
+		
+		var kanjiItem = new KanjiItem($('.kanjiListPanel')[0].innerHTML, currentRowNum);
+		var json = JSON.stringify(kanjiItem); 
+		localStorage.setItem("KanjiItem", json );
+		window.location.href = "index.html";
 	}
 	
 	function markAll(){
@@ -283,9 +364,31 @@
 		//select each  checkbox that are checked
 		$(':checked').each(function( index ) {
 			//go back to <div class = "row">.. </ and remove it 
-			this.offsetParent.offsetParent.parentNode.remove();
+			var row = this.parentNode.parentNode.parentNode.parentNode;
+			//reminderList.splice(row.getAttribute("rownum"), 1);
+			reminderList[parseInt(row.getAttribute("rownum"))] = null;
+			//row.remove();
 		});
 		
+		
+		//recreate list
+		$('#list').html('');
+		var list = [];
+		
+		for(var i = 0; i < reminderList.length; i++){
+			if(reminderList[i] != null){
+				list.push(reminderList[i]); 
+			}
+		} 
+		
+		reminderList = list;
+		for(var i = 0 ; i< reminderList.length; i++){
+			var rendered;
+			rendered = Mustache.render(templateUnmarked, {rownum: i, message: reminderList[i].text});
+			$('#list').append(rendered);
+				//$('#smallList').append(rendered);
+				
+		}
 		
 	}
 	
@@ -312,7 +415,7 @@
 	
 	function onChangeHandler(e){
 		//alert('switch');
-		var div = e.offsetParent.offsetParent.parentNode.childNodes[3].childNodes[1].childNodes[1];
+		var div = e.parentNode.parentNode.parentNode.parentNode.childNodes[3].childNodes[1].childNodes[1];
 		//div.nodeValue  = '✖';
 		if(div.innerHTML  == " ✖ "){
 			div.style.color = "green";
@@ -348,9 +451,11 @@
 			$('#output').focus();
 		}else{
 			//add to html
-			var rendered = Mustache.render(templateUnmarked, {message: memo});		
+			reminderList.push(new ReminderItem(false, memo) );
+			var rendered = Mustache.render(templateUnmarked, {rownum: reminderList.length, message: memo});		
 			$('#list').append(rendered);
-		}
+			
+		}	
 	}
 	
 	//window.onbeforeunload = saveList();
@@ -377,7 +482,7 @@
 		var json = null;
 		if(reminderList != []){
 			json = JSON.stringify(reminderList); 
-			localStorage.setItem("list", json);
+			localStorage.setItem("KanjiList", json);
 		}
 		
 		//console.log(results);

@@ -1,0 +1,25 @@
+<script id="templateUnmarked" type="x-tmpl-mustache">
+	<div class = "row itemList" onclick="doubleclick(this)" rownum = {{rownum}}>	
+		<div class = "col-xs-2 col-lg-3"> 
+			<div class="checkbox" style = "padding-left: 10px" >
+				<label><input type="checkbox" value="" onchange="onChangeHandler(this)"></input></label>
+			</div>
+		</div>
+		<div class = "col-xs-6"> 		
+			 <h5 class = "unselectable"> <font style = "color: red;"> &#10006 </font> {{message}}</h5>		
+		</div>	
+	</div>
+</script>
+			
+<script id="templateMarked" type="x-tmpl-mustache">
+	<div class = "row itemList" onclick="doubleclick(this)" rownum = {{rownum}}>
+		<div class = "col-xs-2 col-lg-3"> 			
+			<div class="checkbox" style = "padding-left: 10px">
+				<label><input type="checkbox" value="" checked onchange="onChangeHandler(this)"></inpuut></label>
+			</div>
+		</div>
+		<div class = "col-xs-6"> 		
+			<h5 class = "unselectable"> <font style = "color: green;"> &#10004 </font> {{message}} </h5>
+		</div>
+	</div>
+</script>

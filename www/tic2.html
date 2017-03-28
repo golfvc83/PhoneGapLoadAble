@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<style>
+
+td{
+	padding: 0;
+	border: solid;
+	border-length: 1px;
+	width: 90px;
+	font-size: 30px;
+	text-align: center;
+	cursor: pointer;
+}
+
+table{
+	border-collapse:collapse;
+	width: 300px;
+	border: 0;
+	margin-left: auto;
+    margin-right: auto;
+}
+
+tr{
+	height: 100px;
+}
+
+h1{ 
+	text-align: center;
+}
+
+#restartText:hover { 
+    text-decoration: underline;
+}
+</style>
+
+<head>
+	<meta charset="utf-8" />
+	<script src="js/jquery.min.js"></script>
+	<script src = "js/bootstrap.min.js"></script>
+</head>
+<!--<div class = "container-fluid">-->
+<h1>Tic tag tow</h1>
+<h4 id = "restartText" style = "text-align: center; visibility: hidden;"> <span id = "restartText" onclick= "restart()" style = "cursor: pointer; color: blue"> reStart?</span></h4>
+<div class = "row">
+<div class = "col-lg-12">
+
+
+
+<table>
+	<tr>
+		<td id = "row0"></td>
+		<td id = "row1"></td>
+		<td id = "row2"></td>
+	</tr>
+	
+	<tr>
+		<td id = "row3"></td>
+		<td id = "row4"></td>
+		<td id = "row5"></td>
+	</tr>
+	
+	<tr>
+		<td id = "row6"></td>
+		<td id = "row7"></td>
+		<td id = "row8"></td>
+	</tr>
+<table>
+</div>
+</div>
+</div>
+
+<script>
+	//robot      //noob_human   
+	var x = "x"; var o = "o";
+	var current = x;
+	var row = "#row";
+	var winnerExist = false;
+	var turnCount = 0;
+	//row 0 - 2 represents first row of the game
+	//row 3 - 6 represents second row of the game and so forth
+	var currentGameList = new Array(8);
+	
+	var boardState = [0,0,0,
+					  0,0,0,
+					  0,0,0];
+					  
+	var rowTocheck = [[0,1,2],[0,3,6],[0,4,8],[1,4,7],[3,4,5],[6,7,8],[2,5,8],[2,4,6]];
+	//var rowTech = { "01":2, "12":0, "02":1, "04": 8, "48": 0, "08": 4, "03":6, "36": 0, "06": 3 };
+	var completeRow = [[],[],[],[]];
+	//var rowTocheck = [[0,1,2]];
+	
+	for(var i = 0; i < 10; i++){
+		var id = row+ i.toString();
+		$(id).attr('row', i);
+		$(id).click(function(){
+			if(!winnerExist && this.innerHTML == "" && turnCount < 9){
+					this.innerHTML = current;
+					boardState[parseInt(this.getAttribute('row'))] = current;
+					turnCount++;
+					row[i] = current;
+					var win = checkwin();
+					
+					if(win != 0){
+						alert( win +" won" );
+						winnerExist = true;
+						$('#restartText').css("visibility","");
+					}else{
+					
+						if(turnCount == 9){
+							alert("There is no winner");
+							$('#restartText').css("visibility","");
+						}
+						current == x? current = o: current = x;
+					}
+				}
+			
+		});
+		
+	}
+	
+	function restart(){
+		for(var i = 0; i < 10; i++){
+			var id = row+ i.toString();
+			$(id).html('');
+		}
+		
+		$('#restartText').css("visibility","hidden");
+		current = x;
+		turnCount = 0;
+		winnerExist = false;
+		boardState = [0,0,0,
+					  0,0,0,
+					  0,0,0];
+	}
+	
+	function checkwin(){
+		var winningItem; 
+		for(var i = 0; i< rowTocheck.length; i++){
+			for(var f = 0; f < rowTocheck[i].length; f++){
+				//var id = row+ rowTocheck[i][f].toString();
+				//if($(id).html() == ''){
+				if(boardState[rowTocheck[i][f]] == 0){
+					break;
+				}else{
+					if(f == 0){
+						//winningItem = $(id).html();
+						winningItem = boardState[rowTocheck[i][f]];
+					}else{
+						if(boardState[rowTocheck[i][f]] != winningItem){
+							break;
+						}
+					}
+					if(f == 2){
+						return winningItem;
+						
+					}
+				}
+				
+			}
+		}
+		return 0;
+	}
+	
+	/*function canWin(){
+		for(var i = 0; i< rowTocheck.length; i++){
+			for(var f = 0; f < rowTocheck[i].length; f++){
+				var id = row+ rowTocheck[i][f].toString();
+				//$(id).html() == '')
+					
+			}
+		}
+		return 0;
+	}*/
+	
+	//find out if there are more moves left
+	
+	function isMovesLeft(f_boardState){
+			for(var i = 0; i < f_boardState.length; i++){
+				if(f_boardState[i] == 0) return true;
+			}
+		
+		return false;
+	}
+	
+	function evaluate(f_boardState){
+		var winningItem; 
+		for(var i = 0; i< rowTocheck.length; i++){
+			for(var f = 0; f < rowTocheck[i].length; f++){
+				//var id = row+ rowTocheck[i][f].toString();
+				//if($(id).html() == ''){
+				if(f_boardState[rowTocheck[i][f]] == 0){
+					break;
+				}else{
+					if(f == 0){
+						//winningItem = $(id).html();
+						winningItem = f_boardState[rowTocheck[i][f]];
+					}else{
+						if(f_boardState[rowTocheck[i][f]] != winningItem){
+							break;
+						}
+					}
+					if(f == 2){
+						//if robot boi
+						if(winningItem == 'x'){
+							return 10;
+						}else{
+							return -10;
+						}
+						
+					}
+				}
+				
+			}
+		}
+		return 0;
+	}
+	//var count = 0
+	function miniMax(f_boardState, depth, isMax){
+		//count++;
+		//f_boardState = a_boardState.slice();
+		var score = evaluate(f_boardState);
+		
+		if(score == 10){
+			return score - depth;
+		}
+		
+		if(score == -10){
+			return score + depth;
+		}
+		
+		if(isMovesLeft(f_boardState)==false){
+			//return 0;
+			return 0;
+		}
+		
+		if(isMax){
+			var best = -1000;
+			
+			for(var i = 0; i <f_boardState.length; i++){
+				if(f_boardState[i] == 0){
+					//var a_boardState = f_boardState.slice();
+					f_boardState[i] = 'x';
+					//var a_boardState = f_boardState.slice();					
+					best = Math.max(best, miniMax(f_boardState, depth+1, !isMax));
+					f_boardState[i] = 0;
+				}
+			}
+			return best;
+		}else{
+			var best = 1000;
+			
+			for(var i = 0; i <f_boardState.length; i++){
+				if(f_boardState[i] == 0){
+					//var a_boardState = f_boardState.slice();
+					f_boardState[i] = 'o';
+					//var a_boardState = f_boardState.slice();					
+					best = Math.min(best, miniMax(f_boardState, depth+1, !isMax));
+					f_boardState[i] = 0;
+				}
+			}
+			return best;
+		}
+	}
+	
+	function findBestMove(f_boardState){
+		var bestVal = -1000;
+		bestMoveRow = -1;
+		
+		for(var i = 0; i < f_boardState.length; i++){
+			if(f_boardState[i] == 0){
+				f_boardState[i] = 'x';
+				var a_boardState = f_boardState.slice();
+				var moveVal = miniMax(a_boardState, 0, false);
+				console.log('position ' +i+' has value of '+ moveVal)
+				f_boardState[i] = 0;
+				
+				if(moveVal > bestVal){
+					bestMoveRow = i;
+					bestVal = moveVal;
+				}
+			}
+		}
+		
+		console.log('the best value for this move is '+bestVal);
+		return bestMoveRow;
+	}
+	
+	
+	function test(boardState){
+		bestMoveRow = findBestMove(boardState);
+		console.log('optimal move is '+ bestMoveRow);
+	}
+	
+	
+function palindrome(str) {
+  // Good luck!
+  str = str.toLowerCase();
+  str = str.replace(/\s/g, '');
+  str = str.replace(/[-:_.*+?^${}()|[\]\\,/]/g,'');
+  
+  
+  var array = str.split('');  
+  var j = array.length-1;
+  var found  = true;
+  for(var i = 0; i < array.length; i++){
+    if(array[i] != array[j]){
+        found = false;      
+    } 
+    j--;
+  }
+  
+  return found;
+}
+
+var array = [5,1,1,2,3,4];
+array.sort();
+
+function onlyUnique(value, index, self) { 
+    return self.indexOf(value) === index;
+}
+
+
+// usage example:
+var a = ['a', 1, 'a', 2, '1'];
+var unique = a.filter( onlyUnique );
+
+function onlyUnique(value, index, self) { 
+    return self.indexOf(value) === index;
+}
+
+function sym(args){
+	var ans = calSys(arguments[0], arguments[1]);
+		
+	for(var i = 2; i < arguments.length; i++){
+		ans = calSys(ans, arguments[i]);
+	}
+	
+	return ans;
+}
+
+function calSys(args) {
+  
+  var ar = [];
+  for(var i = 0; i < arguments.length; i++){
+    var rr = arguments[i].filter( onlyUnique ); //.filter( onlyUnique );
+	for(var f = 0; f < rr.length; f++){
+		ar.push(rr[f]);
+	}
+  }
+
+  var flattened = ar.reduce(function (allNames, name, index) { 
+	if (name in allNames) {
+		allNames[name]++;
+	}	else {
+		allNames[name] = 1;
+	}
+		return allNames;
+	}, {});  
+	
+	var final_ar = [];
+	var keys = Object.keys(flattened);
+	for(var i = 0; i< keys.length; i++){
+		var count = flattened[keys[i]];
+		if(count ==  1){
+			final_ar.push(parseInt(keys[i]));
+		}
+	}
+  //return flattened.filter( onlyUnique );
+  console.log(final_ar);
+  return final_ar;
+}
+
+//sym([3, 3, 3, 2, 5], [2, 1, 5, 7], [3, 4, 6, 6], [1, 2, 3]);
+
+
+function sumAll(arr) {
+  var max = Math.max(arguments[0], arguments[1]);
+  var min = Math.min(arguments[0], arguments[1]);
+  var sum = 0;
+  for(var i = min; i <= max; i++){
+    console.log(i);
+    sum += i;
+  }
+  return sum;
+}
+
+//sumAll([1, 4]);
+
+	/*simple case
+	test(['x','o','x', 
+		  'o','o','x', 
+		   0,0,0]);
+	test(['x','o', 0, 
+		  'x','o', 0,
+		  0,0,0]);
+	test(['x','x', 0, 
+		  'o','o', 0,
+		  0,0,0]);	*/
+	
+	/* auto win
+	test([0, 0, 0, 
+		  0, 0, 0,
+		  0, 0, 0]);
+		  
+	test(['x','o', 0, 
+		  0,  0, 0,
+		  0, 0, 0]);
+	
+    test(['x','o', 0, 
+		  'x',  0, 0,
+		  'o', 0, 0]);
+	
+	test(['x', 'o',   0, 
+		  'x', 'x',   0,
+		  'o',  0,    0]);
+	
+	test(['x', 'o',   0, 
+		  'x',  'x',  'o',
+		  'o',   0,    0]);	
+	*/
+
+	
+	/* must draw 
+	test(['o', 0, 0, 
+		  'x', 0, 0,
+		  0, 0, 0]);
+	
+	test(['o', 0, 'x', 
+		  'x', 'o', 0,
+		  0, 0, 0]);
+	
+	
+	test(['o',   0, 'x', 
+		  'x', 'o',  'o',
+		   0 ,   0, 'x']);
+		   
+	test(['o', 'x', 'x', 
+		  'x', 'o', 'o',
+		   'o' , 0, 'x']);
+	*/
+	
+	/* random position
+	test([0,  0,  0, 
+		  0, 'x', 0,
+		  'o',  0,  0]);
+		  
+	test(['x',    0,  0, 
+		    0,  'x',  0,
+		  'o',    0,  'o']);
+	
+	test(['x',  'o',  0, 
+		    0,  'x',  0,
+		  'o',  'x',  'o']);
+	
+	test(['x',  'o',  'x', 
+		  'o',  'x',  'o',
+		  'o',  'x',  'o']);*/
+
+	/*reverse order
+	//auto dont want to lose
+		
+		test(['o', 0, 0, 
+		  0, 0, 0,
+		  0, 0, 0]);
+		  
+		test(['o', 0, 0, 
+		      'o', 'x', 0,
+		       0, 0, 0]);
+		  
+	    test(['o', 0, 'o', 
+		      'o', 'x', 0,
+		       'x', 0, 0]);
+		 
+		 test(['o', 'x', 'o', 
+		      'o', 'x', 0,
+		       'x', 'o', 0]);
+		
+		test([ 'o', 'x', 'o', 
+		       'o', 'x', 'o',
+		       'x', 'o', 0]);
+	
+		
+	*/
+function convertToRoman(num) { 
+	var romanNum = '';
+	arr = num.toString().split('');
+	//I	V	X	L	C	D	 M
+	//1	5	10	50	100	500	 1,000
+	for(var i = arr.length-1; i >= 0; i--){
+		
+		var small, meduim, large;
+		
+		if( i == arr.length-1 ){
+			small = 'I'; 
+			medium = 'V';
+			large = 'X';
+		}else if(i == arr.length-2){
+			small = 'X';
+			medium = 'L';
+			large = 'C';
+		}else if(i == arr.length-3){
+			small = 'C';
+			medium = 'D';
+			large = 'M';
+		}else if(i == arr.length-4){
+			small = 'M';
+		}
+		
+		var numb = parseInt(arr[i]);
+		if(numb != 0){
+			
+
+		
+		if(numb >= 1 && numb < 4){
+			while(numb > 0){
+				romanNum = small+ romanNum; 
+				numb--;
+			}
+		}
+			
+		else if(numb == 4){
+			romanNum =  small + medium + romanNum	
+		}else if(numb > 4 && numb < 9){
+			var temp = medium;
+			numb -= 5;
+			while(numb > 0){
+				temp += small; 
+				numb--;
+			}
+			romanNum = temp + romanNum;
+		}
+		else if(numb == 9 ){
+			romanNum = small + large + romanNum;
+		}
+		
+		}
+	}
+	console.log(romanNum+' ');
+	return romanNum;
+}
+var i = 1;
+/*convertToRoman(42);
+while(i <= 100){
+	convertToRoman(i);
+	i++;
+}*/
+
+
+function whatIsInAName(collection, source) {
+  // What's in a name?
+  var arr = [];
+  var sourceKeys = Object.keys(source);
+  
+  // Only change code below this line
+  for(var i = 0; i < collection.length; i++){
+	
+     var keys = Object.keys(collection[i]);
+	 var foundInterNal = false;  
+	 for(var f = 0; f < sourceKeys.length; f++){
+
+		if(f > 0){
+			if(!foundInterNal){
+				break;
+			}else{
+				foundInterNal = false;
+			}
+		}
+		
+        for(var x = 0; x < keys.length; x++){
+         //console.log(item[key]);
+		 if(foundInterNal){
+			break;
+		 }
+          if(sourceKeys[f] != keys[x]){
+		  }else{
+		     if(source[sourceKeys[f]] != collection[i][keys[x]]){
+             }else{
+				foundInterNal = true;
+				break;
+			 }
+          }
+        }
+		 
+		 if(foundInterNal && f == sourceKeys.length - 1){
+			arr.push(collection[i]);
+		 }
+     }
+  }
+  // Only change code above this line
+  console.log(arr);
+  return arr;
+}
+
+//whatIsInAName([{ "a": 1 }, { "a": 1 }, { "a": 1, "b": 2 }], { "a": 1 });
+//whatIsInAName([{ "a": 1, "b": 2 }, { "a": 1 }, { "a": 1, "b": 2, "c": 2 }], { "a": 1, "b": 2 });
+
+//whatIsInAName([{ "b": 2, "a": 1 }, { "a": 1, "b":2, "c":7}, {"b": 2, "c": 2, "a": 1 }, { "a": 1, "c":7, "d":8, "b":2} ], { "a": 1, "b": 2, "gg": 123});
+
+function chunkArrayInGroups(arr, size) {
+  // Break it up
+  var allItem = [];
+  for(var i = 0 ; i < arr.length; i++){
+    for(var f = 0; f < arr[i].length; f++){
+      allItem.push(arr[i][f]);
+    }
+  }
+  
+  var sizeCount = 0;
+  var splitItems = [];
+  var oneSet = [];
+  for(var x = 0; x < allItem.length; x++){
+    
+    
+    if(sizeCount < size){
+      oneSet.push(allItem[x]);
+      sizeCount++;
+    }
+	
+	if(x == allItem.length - 1 || sizeCount == size){
+      splitItems.push(oneSet);
+      oneSet = [];
+      sizeCount = 0;
+    }
+    
+  }
+  
+  return splitItems;
+}
+
+//chunkArrayInGroups(["a", "b", "c", "d"], 2);
+
+function destroy(customArgument, val){
+  console.log(customArgument);
+  //console.log(val == this.toPrecision());
+  if(val == customArgument) return false;
+  return true;
+}
+
+function destroyer(arr) {
+  
+  // Remove all the values
+  var toBeDestroyed = arguments[0];
+  
+  //begin destroy
+  for(var i = 1; i < arguments.length; i++){
+    toBeDestroyed = toBeDestroyed.filter(destroy.bind( null, arguments[i]));  
+  }
+  console.log(toBeDestroyed);
+  return toBeDestroyed;
+}
+
+destroyer(["tree", "hamburger", 53], "tree", 53)
+
+function truthCheck(collection, pre) {
+  // Is everyone being true?
+  var allIn = true;
+  
+  for(var i = 0; i < collection.length; i++){
+      if( collection[i][pre] == null){
+        allIn = false;
+        break;
+      }else{
+		if(Number.isNaN(collection[i][pre]) ||  
+			collection[i][pre] == '' ||
+			collection[i][pre] == null
+			){
+				allIn = false;
+				break;
+			}
+	  }
+  }
+  
+  return allIn;
+}
+
+truthCheck([{"user": "Tinky-Winky", "sex": "male"}, {"user": "Dipsy"}, {"user": "Laa-Laa", "sex": "female"}, {"user": "Po", "sex": "female"}], "sex");
+
+</script>
+</html>

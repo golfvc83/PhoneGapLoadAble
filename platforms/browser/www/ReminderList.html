@@ -19,15 +19,16 @@
     <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
 
 
-    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <!--<link rel="stylesheet" type="text/css" href="css/index.css" />-->
 	<!--boostrap include00-->
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
 	<!-- must load jquery before bootstrap.mis.js -->
 	<script src="js/jquery.min.js"></script>
 	<script src = "js/bootstrap.min.js"></script>
+	<script src="js/mustache.min.js"></script>
 	<!-- drawingboard.js requirement-->
 	
-    <title>Hello World</title>
+    <title>Reminder List</title>
 </head>
 
 <!-- the size of the board some how effects whether or not on start drawing works -->
@@ -58,38 +59,67 @@
 		padding-top: 48px;
 	}
 	
+	.headerItem{
+		color: #f5f5ef;	
+		font-size: 24px;
+		padding: 20px;
+	}
+	
+	span.glyphicon {
+		font-size: 0.95em;
+	}
+	
+	.headerItem:hover{   
+		text-decoration: none;
+		color: black;
+		
+	}
+	
+	.shadow{
+		box-shadow: 3px 0px 5px #2e2e1f; overflow: hidden;
+	}
+	
+	
 </style>
 
-<body>
-
-	<div class = "header-inwrap">
-		<h1 class = "site-title">Kanji App</h1>
-		<h2 class = "site-description">Reminder List </h2>
-	</div>
-	
+<body onbeforeunload = "saveList()" style = "background-color: grey">
+		<div id = "header">
+			<div class = "shadow" style = "background-color: #6b6b47; width:100%;">
+				<ul>
+					<il><a class = "headerItem" href = ""> <span class = "glyphicon glyphicon-home"></span></a></il>
+					<il><a class = "headerItem" href = "index.html" >Kanji App</a></il>
+					<il><a class = "headerItem" href = "ReminderList.html">Reminder List</a></il>
+					<il class = "headerItem" ><span class = "glyphicon glyphicon-question-sign" onclick = 'welcomeNote()'></span></il>
+				</ul>
+			</div>
+		</div>
      <!--<div id = "list"></div>-->
 	<div id = "pagebody" class = "container">
+		
+	
+
+		<div class = "well shadow">
+		
 		<div class = "row">
 			<div class = "col-sm-5"> 
-				<button class ="btn btn-default" onclick="clickk()">Remove</button>
+				<button class ="btn btn-default" onclick="markAll()">Mark All</button> 
+				<button class ="btn btn-default" onclick="remove()">Remove</button>
 			</div>
 		</div>
 		
 		<div style = "height: 5px;"></div>
-		
-		<div class = "well">
-			<font id = "title" style = "font-family: 'Enriqueta', arial, serif; font-size: 16px" > Yet to do </font>
+				
 			<div style = "height: 10px;"></div>
-			<div id="" style="overflow-y: scroll; overflow-x: hidden; height: 300px; background-color: white">
+			<div id="list" style="overflow-y: scroll; overflow-x: hidden; height: 400px; background-color: white">
 			
-			<div class = "row">
+			<!--<div class = "row">
 				<div class = "col-sm-1"> 
 					
 					<div class="checkbox" style = "padding-left: 10px">
 						<label><input type="checkbox" value=""></label>
 					</div>
 				</div>
-				<div class = "col-sm-3"> 		<!--glyphicon glyphicon-remove-->
+				<div class = "col-sm-3"> 		
 					<h5>  <font style = "color: red;"> &#10006 </font> get this done</h5>
 					
 				</div>
@@ -101,41 +131,93 @@
 						<label><input type="checkbox" value="" checked></label>
 					</div>
 				</div>
-				<div class = "col-sm-3"> 		<!--glyphicon glyphicon-remove-->
+				<div class = "col-sm-3"> 		
 					<h5> <font style = "color: green;"> &#10004 </font> get this done </h5>
 					
 				</div>
 					
-			</div>
+			</div>-->
 					
 			</div>
 			<div style = "height: 10px;"></div>
 			
 			<div class = "row">
 		
-				<div class = "col-sm-3"> 			
-					<input id = "output" class = "form-control output"> </input>	
+				<div class = "col-sm-7"> 			
+					<input id = "output" rows="5" class = "form-control output"> </input>						
 				</div>
-				<button class ="btn btn-default" onclick="clickk()">Add</button>
+				
+				<button id = "switchText" class ="btn btn-default" 
+				onclick="switchText()">Switch to Text Area</button>
+				
+				<button class ="btn btn-default" onclick="addList()">Add</button>
 			</div>
-		
+			
+			<!--<script id="templateUnmarked" type="x-tmpl-mustache">
+				<div class = "row">
+					<div class = "col-sm-1"> 
+						<div class="checkbox" style = "padding-left: 10px" >
+							<label><input type="checkbox" value="" onchange="onChangeHandler(this)"></label>
+						</div>
+					</div>
+				<div class = "col-sm-3"> 		
+					<h5>  <font style = "color: red;"> &#10006 </font> {{message}}</h5>		
+				</div>
+				</div>
+			</script>
+			
+			<script id="templateMarked" type="x-tmpl-mustache">
+				<div class = "row">
+					<div class = "col-sm-1"> 			
+						<div class="checkbox" style = "padding-left: 10px">
+							<label><input type="checkbox" value="" checked onchange="onChangeHandler(this)"></label>
+						</div>
+					</div>
+					<div class = "col-sm-3"> 		
+						<h5> <font style = "color: green;"> &#10004 </font> {{message}} </h5>
+					</div>
+				</div>
+			</script>-->
+			
 		</div>
 	</div>
 		
 </body>
 
+<script src="header.js"></script>
 <script>
 	//localStorage.setItem("lastname", "Smith");
+	
+	/*<div class = "row">
+		<div class = "col-sm-1"> 
+			<div class="checkbox" style = "padding-left: 10px">
+				<label><input type="checkbox" value=""></label>
+			</div>
+		</div>
+		<div class = "col-sm-3"> 		
+			<h5>  <font style = "color: red;"> &#10006 </font> get this done</h5>		
+		</div>
+	</div>*/
+	
+	var HTML_ROW = "";
+	
+	function welcomeNote(){
+		alert('Welcome to ReminderList programe, try adding something to the textbox below, then click Add.');
+	}
 	function clearSaveItem(){
-		localStorage.removeItem("test");
+		localStorage.removeItem("list");
 	}
 	
-	var ReminderList = function(text){
-		this.status = false;
+	var reminderList = [];
+	var templateUnmarked;
+	var templateMarked;
+		
+	var ReminderItem = function(status, text){
+		this.status = status; //false is not marked
 		this.text = text;
 	}
 	
-	ReminderList.prototype.changeStatus = function(){
+	ReminderItem.prototype.changeStatus = function(){
 		//change to opposite status
 		this.status = !status;  
 	}
@@ -143,12 +225,185 @@
 	function removeReminder(reminder){
 		for(var i = 0;i < reminder; i++){
 			//to do later remove from array test
-			//if(reminder){
-			//}
+			if(reminder[i].status){
+				reminder[i] = null;
+			}
+		}
+		//after this then rearrange the array
+	}
+	
+	window.onload = initPage;
+	
+	assignTemplate = function assignTemplate(){
+		
+		var json = localStorage.getItem("list");
+		
+		templateUnmarked = document.getElementById('templateUnmarked').innerHTML;
+		templateMarked = document.getElementById('templateMarked').innerHTML;
+		//templateMarked = $('#templateMarked').html();
+		if(json == '[]'){
+			//reminderList = [];
+			alert("There is nothing on the list yet");
+		}else{
+			
+			reminderList = JSON.parse(json);
+			var htmlList = $('#list');
+			for(var i = 0 ; i< reminderList.length; i++){
+				var rendered;
+				if(!reminderList[i].status){
+					rendered = Mustache.render(templateUnmarked, {message: reminderList[i].text});
+				}else{
+					rendered = Mustache.render(templateMarked, {message: reminderList[i].text});
+				}
+				
+				$('#list').append(rendered);
+			}
+			
 		}
 	}
 	
-	var results;
+
+	function initPage(){
+
+		loadTemplate("template.html" , assignTemplate);
+
+	}
+	
+	function markAll(){
+		
+		//this one switch all checkboxes $(':checkbox').prop( "checked", true ).change();
+		
+		//.change is needed to trigger onchange event for each checkboxes
+		$("input:checkbox:not(:checked)").prop( "checked", true ).change();
+		//"input:checkbox:not(:checked)" = select all non select checkboxes
+	
+	}
+	
+	function remove(){
+		//select each  checkbox that are checked
+		$(':checked').each(function( index ) {
+			//go back to <div class = "row">.. </ and remove it 
+			this.offsetParent.offsetParent.parentNode.remove();
+		});
+		
+		
+	}
+	
+    String.prototype.format = function() {
+		var formatted = this;
+		for (var i = 0; i < arguments.length; i++) {
+			var regexp = new RegExp('\\{'+i+'\\}', 'gi');
+			formatted = formatted.replace(regexp, arguments[i]);
+		}
+		return formatted;
+	};
+	
+	function swapType(id, typeTo){
+	 var attrs = { };
+	 	$.each($(id)[0].attributes, function(idx, attr) {
+			attrs[attr.nodeName] = attr.nodeValue;
+		});
+		
+		$(id).replaceWith(function () {
+			typeTo = "<"+typeTo + " />";
+			return $(typeTo, attrs).append($(this).contents());
+		});
+	}
+	
+	function onChangeHandler(e){
+		//alert('switch');
+		var div = e.offsetParent.offsetParent.parentNode.childNodes[3].childNodes[1].childNodes[1];
+		//div.nodeValue  = '✖';
+		if(div.innerHTML  == " ✖ "){
+			div.style.color = "green";
+			div.innerHTML  = " ✔ ";
+		}else{
+			div.style.color = "red";
+			div.innerHTML  = " ✖ ";
+		}
+		
+	}
+	
+	function switchText(){
+		var output =  $('#output');
+		
+	
+		//if textbox -> textarea else textarea -> textbox
+		if(output.prop("tagName") == 'INPUT'){
+			//copy all attributes over 
+			swapType('#output', "textarea");
+			$('#switchText').html("Switch to TextBox");
+		}else{
+		
+			swapType('#output', "input")
+			$('#switchText').html("Switch to TextArea");
+		}
+	}
+	
+	function addList(){
+		var memo = $('#output').val();
+		
+		if(memo == ''){
+			alert("Please enter a memo in the textbox/area");
+			$('#output').focus();
+		}else{
+			//add to html
+			var rendered = Mustache.render(templateUnmarked, {message: memo});		
+			$('#list').append(rendered);
+		}
+	}
+	
+	//window.onbeforeunload = saveList();
+	//window.addEventListener("unload", saveList());
+	
+	function saveList(){
+	
+		reminderList = [];
+		$('#list').find('div.row').each(function( index ) {
+			
+			//get message of an item 
+			var message = this.childNodes[3].childNodes[1].lastChild.wholeText;
+			
+			//get status
+			var status = false;	
+			if(this.childNodes[3].childNodes[1].childNodes[1].innerHTML == " ✔ "){
+				status = true;
+			}
+			
+			reminderList.push(new ReminderItem(status, message));
+			
+		});
+		
+		var json = null;
+		if(reminderList != []){
+			json = JSON.stringify(reminderList); 
+			localStorage.setItem("list", json);
+		}
+		
+		//console.log(results);
+	
+		
+		//return "You have attempted to leave this page.  If you have made any changes to the fields without clicking the Save button, your changes will be lost.  Are you sure you want to exit this page?";
+	}
+	
+	function loadTemplate(name, callback){ 
+		var rawFile = new XMLHttpRequest();
+		rawFile.open('GET', name, true);
+		rawFile.overrideMimeType("text/html;");
+		rawFile.onreadystatechange= function() {
+			if (this.readyState!==4) return;
+			if (this.status!==200) return; 
+			document.getElementById("pagebody").innerHTML += this.responseText;
+			callback();
+			//$('#pagebody').append(this.responseText);
+		};
+		rawFile.send(null);
+		//return template;
+	
+
+	}
+	
+	/*var results;
 	var json = localStorage.getItem("test");
 	
 	if(json == null){
@@ -157,13 +412,11 @@
 		results = JSON.parse(json);
 	}
 
-	results.push(new Result("asda",1));
+	results.push(new ReminderItem("asda",1));*/
 	
-	json = JSON.stringify(results); 
-	console.log(results);
 	
-	localStorage.setItem("test", json);
-	
+	//console.log('The {0} is dead. Don\'t code {0}. Code {1} that is open source!'.format('ASP', 'PHP'));
+
 	
 </script>
 </html>

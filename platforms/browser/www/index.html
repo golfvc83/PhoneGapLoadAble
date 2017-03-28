@@ -40,12 +40,13 @@
     <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
 
 
-    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <!--<link rel="stylesheet" type="text/css" href="css/index.css" />-->
 	<!--boostrap include00-->
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
 	<!-- must load jquery before bootstrap.mis.js -->
 	<script src="js/jquery.min.js"></script>
 	<script src = "js/bootstrap.min.js"></script>
+	
 	<style>
 		@font-face { font-family: kanji; src: url('KanjiStrokeOrders_v4.000.ttf'); } 
 	</style>
@@ -53,16 +54,25 @@
 	
 	<script src="js/simple-undo.js"></script>
 	<script src = "js/drawingboard.js"></script>
-	<link rel="stylesheet" href="css/drawingboard.css" />
+	<link rel="stylesheet" href="css/drawingboard.css">
     <title>Hello World</title>
 </head>
 
 <!-- the size of the board some how effects whether or not on start drawing works -->
 <style>
+	
+	body{
+		background-color: grey;
+	}
+
     #zbeubeu {
-        width: 387px;
+		width: 357px;
         height: 400px;
     }
+	
+	body, html, .height100{
+		height: 100%
+	}
 	
 	.resultPanel{
 		background-color: white;
@@ -71,20 +81,6 @@
 		text-align:center;	
 	}
 	 
-	 .big {
-        width: 300px;
-        height: 320px;
-    }
-	
-	 .medium {
-        width: 135px;
-        height: 170px;
-    }
-	
-	 .small {
-        width: 50px;
-        height: 80px;
-    }
 	
 	.circle{
 		background: #FA8072;
@@ -94,17 +90,18 @@
 	}
 	
 	.kanjiBig{
-		font-size: 200px;
-		font-family: kanji;
-		
+		font-size: 160px;
+		font-family: kanji;	
 	}
 	
 	.kanjiMid{
-		font-size: 100px; font-family: kanji
+		font-size: 80px; 
+		font-family: kanji; 
 	}
 	
 	.kanjiTiny{
-		font-size: 50px; font-family: kanji
+		font-size: 50px; 
+		font-family: kanji; 
 	}
 	
 	.score{
@@ -117,187 +114,121 @@
 	.output{
 		padding: 2px;
 	}
-</style>
-
-<body style = "padding: 20px">
-    
-     <h1>Kanji Drawing Board</h1>
-     <!--<div id = "list"></div>-->
-	 
-	 <div class="row">
+	
+	@media (max-width:360px){.headerItem{
+		color: #f5f5ef;	
+		font-size: 14px;	
+		padding: 10px;
+	}}
+	
+	@media (min-width:360px){.headerItem{
+		color: #f5f5ef;	
+		font-size: 24px;
+		padding: 20px;
+	}}
+	
+	span.glyphicon {
+		font-size: 0.95em;
+	}
+	
+	.headerItem:hover{   
+		text-decoration: none;
+		color: black;
 		
-		<div class="col-sm-4" >
-			<div class = "well">
+	}
+	
+	.shadow{
+		box-shadow: 3px 0px 5px #2e2e1f; overflow: hidden;
+	}
+	
+</style>
+<div id = "header">
+		<div class = "shadow" style = "background-color: #6b6b47; width:100%; position: fixed; z-index: 999; top: 0;">
+			<ul>
+				<il><a class = "headerItem" href = ""> <span class = "glyphicon glyphicon-home"></span></a></il>
+				<il><a class = "headerItem" href = "index.html" >Kanji App</a></il>
+				<il><a class = "headerItem" href = "KanjiReminderList.html">Reminder List</a></il>
+				<il class = "headerItem" ><span class = "glyphicon glyphicon-question-sign" onclick = 'welcomeNote()'></span></il>
+			</ul>
+		</div>
+</div>
+<body>
+ 
+	<div id = "mainrow" class="row" style = "padding-top: 40px; height: 100%; position: relative; z-index: 99;">		
+		<div class="col-xs-12 col-lg-offset-1 col-lg-4" style = "padding: 22px;">
+			
+			<div id = "canvasWell" class = "well shadow">
 				<div id="zbeubeu" ></div>
 				<div>output:</div>
 				<input id = "output" class = "form-control output"> </input>
 				<div style = "height: 10px;"></div>
 				
-				<button class ="btn btn-default" onclick = "onClickk">Add to List</button>
-				<button class ="btn btn-default" onclick="copy()">Copy</button>	
+				<button class ="btn btn-default" onclick = "addToList()">Add to List</button>
+				<!--<button class ="btn btn-default" onclick="copy()">Copy</button>	-->
+				<button class ="btn btn-default" onclick="compareToCurrentItem()">Compare to current Item</button>	
 			</div>
-	</div>
+		</div>
 		
-		<div id = "strict result" class="col-sm-3 well">
+		<div id = "strict result" class="col-xs-12 col-lg-5 " style = "padding: 22px;">
+			<div id = "canvasWell" class = "well shadow" style = "height: 100%;">
 		 <div class="row">
-		 	<div class="col-sm-12">
+		 	<div class="col-xs-12">
 				<div>Exact Match</div>
 			</div>
 		 </div>	
+			
+			<div class="row" style = "padding: 2px;">
+				<div class="col-sm-12">
+					<div id = "strict0" class = "resultPanel"><font style = "font-size:150px;"></font></div> 
+				</div>
+			</div>
+			
 			 <div class="row" style = "padding: 2px;">
 				<div class="col-sm-12">
-					<div id = "strict1" class = "resultPanel big"><div class ="score"></div><font class = "kanjiBig"></font></div> <!---->
+					<div id = "strict1" class = "resultPanel"><div class ="score" style = "visibility: hidden">100%</div><font class = "kanjiBig" style = "visibility: hidden">一</font></div> 
 				</div>
 			</div>
 					
 			<div class="row" style = "padding: 2px;">
 				<div class ="col-sm-6" >
-					<div id = "strict2" class = "resultPanel medium"><div class ="score"></div><font class = "kanjiMid"></font></div>
+					<div id = "strict2" class = "resultPanel"><div class ="score" style = "visibility: hidden">100%</div><font class = "kanjiMid" style = "visibility: hidden">一</font></div>
 				</div>
 			
 				<div class ="col-sm-6" >	
-					<div id = "strict3" class = "resultPanel medium"><div class ="score"></div><font class = "kanjiMid"></font></div>
+					<div id = "strict3" class = "resultPanel"><div class ="score" style = "visibility: hidden">100%</div><font class = "kanjiMid" style = "visibility: hidden">一</font></div>
 				</div>
 			</div>
 			
 			<div class="row" style = "padding: 2px;">
 				<div class ="col-sm-4" >
-						<div id = "strict4" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny">	</font></div>
+						<div id = "strict4" class = "resultPanel"><div class ="score" style = "visibility: hidden">100%</div><font class = "kanjiTiny" style = "visibility: hidden">一</font></div>
 				</div>
 				
 				<div class ="col-sm-4" >
-						<div id = "strict5" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+						<div id = "strict5" class = "resultPanel"><div class ="score" style = "visibility: hidden">100%</div><font class = "kanjiTiny" style = "visibility: hidden">一</font></div>
 				</div>
 				
 				<div class ="col-sm-4" >
-					<div id = "strict6" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+					<div id = "strict6" class = "resultPanel"><div class ="score" style = "visibility: hidden">100%</div><font class = "kanjiTiny" style = "visibility: hidden">一</font></div>
 				</div>
 			</div>
 			
 			<div class="row" style = "padding: 2px;">
 				<div class ="col-sm-4" >
-					<div id = "strict7" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+					<div id = "strict7" class = "resultPanel" ><div class ="score" style = "visibility: hidden">100%</div><font class = "kanjiTiny" style = "visibility: hidden">一</font></div>
 				</div>
 				
 				<div class ="col-sm-4" >
-					<div id = "strict8" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+					<div id = "strict8" class = "resultPanel"><div class ="score" style = "visibility: hidden">100%</div><font class = "kanjiTiny" style = "visibility: hidden">一</font></div>
 				</div>
 				
 				<div class ="col-sm-4" >
-					<div id = "strict9" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
+					<div id = "strict9" class = "resultPanel" ><div class ="score" style = "visibility: hidden">100%</div><font class = "kanjiTiny" style = "visibility: hidden">一</font></div>
 				</div>
 			</div>
 		</div>
-		
-		
-		<div id = "fuzz1 result" class="col-sm-3 well">
-		 <div class="row">
-		 	<div class="col-sm-12">
-				<div>+-1</div>
-			</div>
-		 </div>	
-		 
-			 <div class="row" style = "padding: 2px;">
-				<div class="col-sm-12">
-					<div id = "fuzz11" class = "resultPanel big"><div class ="score"></div><font class = "kanjiBig"></font></div> <!---->
-				</div>
-			</div>
-					
-			<div class="row" style = "padding: 2px;">
-				<div class ="col-sm-6" >
-					<div id = "fuzz12" class = "resultPanel medium"><div class ="score"></div><font class = "kanjiMid"></font></div>
-				</div>
-			
-				<div class ="col-sm-6" >	
-					<div id = "fuzz13" class = "resultPanel medium"><div class ="score"></div><font class = "kanjiMid"></font></div>
-				</div>
-			</div>
-			
-			<div class="row" style = "padding: 2px;">
-				<div class ="col-sm-4" >
-						<div id = "fuzz14" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny">	</font></div>
-				</div>
-				
-				<div class ="col-sm-4" >
-						<div id = "fuzz15" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
-				</div>
-				
-				<div class ="col-sm-4" >
-					<div id = "fuzz16" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
-				</div>
-			</div>
-			
-			<div class="row" style = "padding: 2px;">
-				<div class ="col-sm-4" >
-					<div id = "fuzz17" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
-				</div>
-				
-				<div class ="col-sm-4" >
-					<div id = "fuzz18" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
-				</div>
-				
-				<div class ="col-sm-4" >
-					<div id = "fuzz19" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
-				</div>
-			</div>
-		</div>
-		
-		
-		<!--<div id = "fuzz2 result" class="col-sm-3 well">
-		 <div class="row">
-		 	<div class="col-sm-12">
-				<div>+-2</div>
-			</div>
-		 </div>	
-			 <div class="row" style = "padding: 2px;">
-				<div class="col-sm-12">
-					<div id = "fuzz21" class = "resultPanel big"><div class ="score"></div><font class = "kanjiBig"></font></div> 
-				</div>
-			</div>
-					
-			<div class="row" style = "padding: 2px;">
-				<div class ="col-sm-6" >
-					<div id = "fuzz22" class = "resultPanel medium"><div class ="score"></div><font class = "kanjiMid"></font></div>
-				</div>
-			
-				<div class ="col-sm-6" >	
-					<div id = "fuzz23" class = "resultPanel medium"><div class ="score"></div><font class = "kanjiMid"></font></div>
-				</div>
-			</div>
-			
-			<div class="row" style = "padding: 2px;">
-				<div class ="col-sm-4" >
-						<div id = "fuzz24" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny">	</font></div>
-				</div>
-				
-				<div class ="col-sm-4" >
-						<div id = "fuzz25" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
-				</div>
-				
-				<div class ="col-sm-4" >
-					<div id = "fuzz26" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
-				</div>
-			</div>
-			
-			<div class="row" style = "padding: 2px;">
-				<div class ="col-sm-4" >
-					<div id = "fuzz27" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
-				</div>
-				
-				<div class ="col-sm-4" >
-					<div id = "fuzz28" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
-				</div>
-				
-				<div class ="col-sm-4" >
-					<div id = "fuzz29" class = "resultPanel" ><div class ="score"></div><font class = "kanjiTiny"></font></div>
-				</div>
-			</div>
-		</div>-->
-		
-		
-		
-		
-		
+	</div>
+	
 	 </div>
 	 
 </body>
@@ -412,9 +343,7 @@
 	}
 		
 	var Direction = function(direction){
-		this.direction = direction
-		 //alert(Direction.DIRECTION_THRESHOLD);
-		
+		this.direction = direction;		
 	}
 	
 	Direction.N  = {NAME: "N", VALUE1: 0,  UNICODE: "\u2191"}; 
@@ -582,7 +511,6 @@
 		
 		}else{
 			this.kanji = kanji;
-			//alert("second option " + kanji);
 		}
 		
 		function getTwoDigitHexInt(input, pos){
@@ -770,39 +698,99 @@
 		//key1 in map;*/
 	
 	var clearFlag = false; 
+	var currentNumRow;
+	var reminderList;
+	
 	window.onload = function(){
 		$('.drawing-board-control-navigation-reset').on('click', function() {
 		/* your code here */
 			clearFlag = true;
 		});
-	};
-		// init drawing board
-		var kanjiList = {};
-		myBoard = new DrawingBoard.Board('zbeubeu',{size: 6, undo: false});//pencil size6
-		myBoard.ev.bind('board:startDrawing',why1111);
-		myBoard.ev.bind('board:stopDrawing',why2);
-		myBoard.ev.bind('board:reset',why3);
-		myBoard.ev.bind('historyNavigation',why4);
 		
-		//extends further undo and redo functionality 
-		var stack1 = [];
-		var stack2 = [];
-		var  dummy = 0;
-		stack1.push(dummy);
-		
-		/*stack.push(2);       // stack is now [2]
-		stack.push(5);       // stack is now [2, 5]
-		var i = stack.pop(); // stack is now [2]
-		alert(i);            // displays 5 */
-		
-		function why4(){
-			console.log('init history');
+		canvasResize();
+		var json = localStorage.getItem("KanjiItem");
+		var kanjiFromList = JSON.parse(json);
+		if(kanjiFromList != null){
+			$('#strict0').find('font').html(kanjiFromList.kanji.trim());
+			currentNumRow = kanjiFromList.rownum;
 		}
 		
-		//myBoard.ev.bind('board:mouseOver',why4);
-		//myBoard.ev.bind('board:mouseOver',why2);
-
+		var json = localStorage.getItem("KanjiList");
+		reminderList = JSON.parse(json);
+		if(reminderList == null){
+			reminderList = [];
+		}
+		
+	};
 	
+	function compareToCurrentItem(){
+		
+		var kanji = $('#strict0').find('font').html();
+		if($('#output').val() == kanji.trim()){
+			reminderList[currentNumRow].status = true;
+			json = JSON.stringify(reminderList); 
+			localStorage.setItem("KanjiList", json);
+			window.location.href = "KanjiReminderList.html";
+		}else{
+			alert('Kanji in textbox is not the same as comparison kanji');
+		}
+	}
+		// init drawing board
+		var kanjiList = {};
+		myBoard = new DrawingBoard.Board('zbeubeu',{size: 6, undo: true});//pencil size6
+		myBoard.ev.bind('board:startDrawing',getStrokeCoordinate);
+		myBoard.ev.bind('board:stopDrawing',findMatch);
+		myBoard.ev.bind('board:reset',rebindStroke);
+		//myBoard.ev.bind('historyNavigation',why4);
+		
+		//canvas resize function
+		function canvasResize(){
+			//var canvas = document.getElementById('zbeubeu');
+			var divHeight = document.getElementById('canvasWell').clientHeight;
+			var divWidth = document.getElementById('canvasWell').clientWidth;
+			
+			//canvas.style.height = divHeight;
+			//canvas.style.width = divWidth - 20;
+			
+			//make canvas resize according to its well
+			var newWidth = divWidth - 40;
+			newWidth = newWidth.toString() + "px";
+			$('.drawing-board-canvas-wrapper')[0].style.width = newWidth;
+			$('.drawing-board-canvas')[0].style.width = newWidth;
+			
+			//hide pencil size selector if it is too small
+			if(divWidth < 346){
+				$('.drawing-board-control.drawing-board-control-size')[0].style.display = 'none';
+			}else{
+				$('.drawing-board-control.drawing-board-control-size')[0].style.display = '';
+			}
+		}
+
+		window.addEventListener('resize', canvasResize);
+		
+		var ReminderItem = function(status, text){
+			this.status = status; //false is not marked
+			this.text = text;
+		}
+	
+		function addToList(){
+			var kanjiFromTextBox = $('#output').val();
+			if(kanjiFromTextBox.length != 1 ){
+				alert("Please, select only one kanji in the textbox to add to list.");
+			}else{
+				
+				
+				reminderList.push(new ReminderItem(false, kanjiFromTextBox));
+				json = JSON.stringify(reminderList); 
+				localStorage.setItem("KanjiList", json);
+		
+				
+				window.location.href = "KanjiReminderList.html";
+				//alert("kanjiAdded");
+				//$('#output').val('');
+			}
+		}
+		
 		//var kanji = new KanjiInfo("iku",";asdasda"); 
 		var rawFile = new XMLHttpRequest();
 		var file = "strokes-20160712.xml";
@@ -977,7 +965,7 @@
 	
 	
 	
-	function why1111() {
+	function getStrokeCoordinate() {
 		//console.log('startDrawing');
 		//console.log(myBoard.customAlert());
 		startX = myBoard.customAlert().x;
@@ -1025,36 +1013,16 @@
 	
 	var map;
 	
-	function why2() {
-		
-		/*endX = myBoard.customAlert().x;
-		endY = myBoard.customAlert().y;		
-		var inputStroke = new InputStroke(startX, startY, endX, endY);
-		potentialKanji.addStroke(inputStroke);*/
-		
-		findMatch();
-		dummy += 1;
-		stack1.push(dummy);
-		/*if(potentialKanji.strokes.length == 6){
-			//potentialKanji.printLoadingStroke();
-			console.log('Match Score is :' + strict.getMatchScore(potentialKanji));
-		}else{
-			console.log(potentialKanji.strokes.length);
-		}*/
-		
-		//do kani compare
-		//print out list of possible kanji
-		
-	}
-	 
 	function findMatch(){
 		
 		//clear screen first
 		for(var i = 1; i< 10; i++){
 
 			var strictId =  STRICT + i.toString();
-			$(strictId).find('.score').html('');
-			$(strictId).find('font').html('');
+			//$(strictId).find('.score').html('');
+			//$(strictId).find('font').html('');
+			$(strictId).find('.score')[0].style.visibility = 'hidden';
+			$(strictId).find('font')[0].style.visibility = 'hidden';
 				//document.getElementById(strict);
 		}
 		
@@ -1064,8 +1032,9 @@
 		
 		//begin comparing process;
 		var strict = new StrictComparer(potentialKanji);
-		var fuzzy = new FuzzyComparer(potentialKanji);
 		
+		//!!!var fuzzy = new FuzzyComparer(potentialKanji);
+		var fuzzy = null;
 		var strokeCount = potentialKanji.strokes.length; 
 		 
 		if(kanjiList[strokeCount]  == null){	
@@ -1096,19 +1065,21 @@
 			
 			//var kanjiRanking = [];
 			
+			
 			for(var i = 0; i < kanjiWithSameStroke.length; i++){
 				var score = strict.getMatchScore(kanjiWithSameStroke[i]);
-				var score_fuzz = fuzzy.getMatchScore(kanjiWithSameStroke[i]);
+				//!!!var score_fuzz = fuzzy.getMatchScore(kanjiWithSameStroke[i]);
+				
 				//map.set(score, kanjiWithSameStroke[i].kanji);	
 				if(score > 80){
 					results.push(new Result(kanjiWithSameStroke[i].kanji, score));
 				}
-				
+				/*!!!
 				if(score_fuzz > 80){
 					results_fuz.push(new Result(kanjiWithSameStroke[i].kanji, score_fuzz));
-				}
+				}*/
 			}
-				
+			if(fuzzy!= null){	
 			//fuzzout1
 			if(kanjiStrokePlusOne != null){
 				for(var i = 0; i < kanjiStrokePlusOne.length; i++){	
@@ -1146,11 +1117,11 @@
 					}
 				}
 			}
-			
+			}
 			results = sortResult(results);
-			results_fuz = sortResult(results_fuz);
+			/*!!!results_fuz = sortResult(results_fuz);
 			results_fuzout1 = sortResult(results_fuzout1);
-            results_fuzout2 = sortResult(results_fuzout2);
+            results_fuzout2 = sortResult(results_fuzout2);*/
 			
 			//console.log(results);
 			for(var i = 0; i< results.length ;i++){
@@ -1161,10 +1132,12 @@
 				var strictId =  STRICT + f;
 				$(strictId).find('.score').html(Math.round(results[i].score).toString()+'%');
 				$(strictId).find('font').html(results[i].kanji);
+				$(strictId).find('.score')[0].style.visibility = '';
+				$(strictId).find('font')[0].style.visibility = '';
 				//document.getElementById(strict);
 			}
 			
-			for(var i = 0; i< results_fuzout1.length ;i++){
+			/*for(var i = 0; i< results_fuzout1.length ;i++){
 				if(i > 8 ){
 					break;
 				}
@@ -1184,12 +1157,12 @@
 				$(Id).find('.score').html(Math.round(results_fuzout2[i].score).toString()+'%');
 				$(Id).find('font').html(results_fuzout2[i].kanji);
 				//document.getElementById(strict);
-			}
+			}*/
 			
 			results = [];
-			results_fuz = [];
+			/*results_fuz = [];
 			results_fuzout1 = [];
-            results_fuzout2 = [];
+            results_fuzout2 = [];*/
 			//var mapAsc = new Map([...map.entries()].sort().reverse());
 			//console.log(results);
 			
@@ -1197,18 +1170,11 @@
 		
 	}
 	
-	function why3() {
-		//wtf the startDrawing event some how unbinds when clear button is pressed, therefore have to redo it here
-		myBoard.ev.bind('board:startDrawing',why1111);
+	function rebindStroke() {
+		//the startDrawing event some how unbinds when clear button is pressed, therefore have to redo it here
+		myBoard.ev.bind('board:startDrawing',getStrokeCoordinate);
 	}
 	
-	function why4(){
-		alert('yahalo');
-	}
-	
-	function why4(){
-		$('#board_coor').html('x: '+ myBoard.customAlert().x+' '+'y: '+ myBoard.customAlert().y);
-	}
 	//89.5 %
 	//[[109.0,132.0:60.0,165.0], [101.0,164.0:55.0,199.0], [74.0,179.0:83.0,237.0], [134.0,128.0:182.0,141.0], [131.0,160.0:181.0,166.0], [167.0,164.0:145.0,227.0]]
 	//[[108,9:10,87], [92,84:0,166], [38,119:56,255], [159,0:255,30], [153,75:253,89], [225,84:181,232]]
@@ -1261,14 +1227,6 @@
 	 potentialKanji.moveDirections*/
 	 //potentialKanji.printStroke();
 	 
-	//store lable information
-	function clickk(){
-		//sessionStorage.getItem('label')
-		alert('test');
-		sessionStorage.setItem('label', 'value');
-		window.location.href = "index.html";
-	
-	}
 	
 	//store lable information
 	function copy(){

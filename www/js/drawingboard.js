@@ -592,13 +592,15 @@ DrawingBoard.Board.prototype = {
 					for(var i = 1; i< 10; i++){
 						var strictId =  STRICT + i.toString();
 						
-						$(strictId).find('.score').html('');
-						$(strictId).find('font').html('');
+						$(strictId).find('.score')[0].style.visibility = 'hidden';
+						$(strictId).find('font')[0].style.visibility = 'hidden';
+						//$(strictId).find('.score').html('');
+						//$(strictId).find('font').html('');
 						
-						var fuzz1Id = FUZZOUT1 + i.toString();
-						$(fuzz1Id).find('.score').html('');
-						$(fuzz1Id).find('font').html('');
-						//document.getElementById(strict);
+						//var fuzz1Id = FUZZOUT1 + i.toString();
+						//$(fuzz1Id).find('.score').html('');
+						//$(fuzz1Id).find('font').html('');
+						
 					}
 					
 				
@@ -669,8 +671,14 @@ DrawingBoard.Board.prototype = {
 		img.src = src;
 		//img.src = src[1];
 		
-		//attemp redrawn on other panels -Golffy
-		potentialKanji.setLoadingStroke(stroke);
+		
+		var newStroke = [];
+		
+		for(var i = 0; i < stroke.length; i ++){
+			newStroke[i] = stroke[i];
+		}
+		
+		potentialKanji.setLoadingStroke(newStroke);
 		findMatch();
 	},
 

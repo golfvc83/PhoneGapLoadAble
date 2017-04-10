@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2016 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+
+<head>
+    <meta charset="utf-8" />
+	<!--<meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-eval' 'unsafe-inline'; img-src 'self' data:" />-->
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+	<meta http-equiv="Content-Security-Policy" content="default-src *; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'; img-src * data: 'unsafe-inline'; connect-src * 'unsafe-inline'; child-src *;" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <!-- Good default declaration:
+    * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+    * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+    * Disables use of eval() and inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+        * Enable inline JS: add 'unsafe-inline' to default-src
+        * Enable eval(): add 'unsafe-eval' to default-src
+    * Create your own at http://cspisawesome.com
+    -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+
+
+    <!--<link rel="stylesheet" type="text/css" href="css/index.css" />-->
+	<!--boostrap include00-->
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+	<!-- must load jquery before bootstrap.mis.js -->
+	<script src="js/jquery.min.js"></script>
+	<script src = "js/bootstrap.min.js"></script>
+	
+	<!-- drawingboard.js requirement-->
+	
+	<script src="js/simple-undo.js"></script>
+	<script src = "js/drawingboard.js"></script>
+	<script src="js/mustache.min.js"></script>
+	<script src="js/list.js"></script>
+	<script src="js/jquery-ui.min.js"></script>
+	<script src="js/FileSaver.min.js"></script>
+	<link rel="stylesheet" href="css/drawingboard.css">
+    <title>Hello World</title>
+</head>
+
+<!-- the size of the board some how effects whether or not on start drawing works -->
+<style>
+	
+	@font-face { font-family: kanji; src: url('KanjiStrokeOrders_v4.000.ttf'); } 
+	body{
+		background-color: grey;
+	}
+	body, html, .height100{
+		height: 100%
+	}
+	
+	.resultPanel{
+		background-color: white;
+		border-style:solid; border-color:lightgrey;
+		border-width: 1px;	
+		text-align:center;	
+	}
+	 
+	
+	.circle{
+		background: #FA8072;
+		border-radius: 50%;
+		border-style:solid; border-color:lightgrey;
+		border-width: 2px;	
+	}
+	
+	.kanjiBig{
+		font-size: 160px;
+		font-family: kanji;	
+	}
+	
+	.kanjiMid{
+		font-size: 80px; 
+		font-family: kanji; 
+	}
+	
+	.kanjiTiny{
+		font-size: 50px; 
+		font-family: kanji; 
+	}
+	
+	.score{
+		background-color: black;
+		font-color: white;
+		border-style:solid; border-color:lightgrey;
+		border-width: 2px;
+	}
+	
+	.output{
+		padding: 2px;
+	}
+		
+	.hh{
+			height: 482px;
+		}
+	
+	
+	@media (min-width:1px){.headerItem{
+		color: #f5f5ef;	
+		font-size: 14px;	
+		padding: 10px;
+	}}
+	
+	@media (min-width:768px){.headerItem{
+		color: #f5f5ef;	
+		font-size: 24px;
+		padding-right: 30px;
+		padding-left: 20px;
+	}}
+	
+	span.glyphicon {
+		font-size: 0.95em;
+	}
+	
+	span.glyphicon:hover {
+		cursor: pointer;
+	}
+	
+	.headerItem:hover{   
+		text-decoration: none;
+		color: black;
+	}
+	
+	.shadow{
+		box-shadow: 3px 0px 5px #2e2e1f; overflow: hidden;
+	}
+	
+	.ff{
+		font-family: "Arial Black", Gadget, sans-serif;
+	}
+	
+	ul {
+		list-style-type: none;
+		margin: 0;
+		padding: 0;
+	}
+	
+	li {
+		display: block;   
+	}
+	
+	li a {
+		float: left;
+		text-align: center;
+		text-decoration: none;
+	}
+	
+	.sidenav {
+		height: 100%;
+		width: 0;
+		position: fixed;
+		top: 0;
+		left: 0;
+		background-color: #111;
+		border-width: 1px;
+		padding: 77px 10px 0px 10px;
+		z-index: 999;
+	}	
+	
+	
+</style>
+<div id = "header">
+		<div class = "shadow" style = "background-color: #6b6b47; width: 100%; position: fixed; z-index: 999; top: 0;">
+				<nav>
+					<ul>
+						<li><a class = "headerItem"> <span class = "glyphicon glyphicon-th-list"></span></a></li>
+						<li><a class = "ff headerItem" href = "index.html" >Kanji App</a></li>
+						<!--<li><a class = "ff 	headerItem" href = "KanjiReminderList.html">Reminder List</a></li>-->
+						<li><a class = "ff 	headerItem" href = "about.html">About</a></li>
+						<li style = "float: right;"><a class = "headerItem" ><span class = "glyphicon glyphicon-question-sign" onclick = 'welcomeNote()'></a></span></li>
+					</ul>
+				</nav>
+		</div>
+	</div>
+<body>
+			
+	<div style = "margin-top: 60px;"></div>
+	
+	<div class = "row">
+		<div class = "col-lg-12">	
+			<div class = "container">
+				<div class = "well">
+					<h5>Props to various online resources, I was able to put out a kanji recognizer web application.
+					This application is for self learning purposes and it is not commercial in anyway. If anyone is interested in learning how I made it, please 
+					let me know.
+					</h5>
+					
+					<h6>
+					<b>Email: </b> golf_vc83@hotmail.com 
+					</h6>
+					<h6><b>@Golffy</b></h6>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
+	
+	
+	
+</script>
+</html>

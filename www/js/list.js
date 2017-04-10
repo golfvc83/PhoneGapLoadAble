@@ -241,7 +241,12 @@ function openNav() {
 		e.style.backgroundColor = '#7a8787';
 		currentlySelectItem = e;
 		currentRowNum = parseInt(e.getAttribute("rownum"));
+			
+		$('#switchBtn').html('Switch to kanji');
+		$('#strokeBtn').css('display', 'none');
 		$('#strict0 font').html(reminderList[currentRowNum].meaning);
 		$('#strict0 font').css('font-size', '40px');
+		
+		
 	}
 	

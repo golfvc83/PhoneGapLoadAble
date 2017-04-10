@@ -186,27 +186,42 @@
 					<ul>
 						<li><a class = "headerItem"> <span class = "glyphicon glyphicon-th-list" onclick = 'openNav()'></span></a></li>
 						<li><a class = "ff headerItem" href = "index.html" >Kanji App</a></li>
-						<li><a class = "ff 	headerItem" href = "KanjiReminderList.html">Reminder List</a></li>
+						<!--<li><a class = "ff 	headerItem" href = "KanjiReminderList.html">Reminder List</a></li>-->
+						<li><a class = "ff 	headerItem" href = "about.html">About</a></li>
 						<li style = "float: right;"><a class = "headerItem" ><span class = "glyphicon glyphicon-question-sign" onclick = 'welcomeNote()'></a></span></li>
 					</ul>
 				</nav>
 		</div>
 	</div>
 <body>
-
-		<div id="mySidenav" class="sidenav" style = "width: 0px; visibility: hidden; background-color:grey; border-right: solid; border-width: 1px;">
-				<div class = "well shadow">
-					<div style = "margin-bottom: 5px;">
-						<!--<button class ="btn btn-default" onclick="markAll()">Mark All</button>-->
-						<button class ="btn btn-default" onclick="unMarkAll()">Unmark All</button>
-						<button class ="btn btn-default" onclick="remove()">Remove</button>
-					</div>
-					<div id="list" class = "resultPanel hh" style="overflow-y: scroll; overflow-x: hidden; background-color: white;">	
-					</div>	
-				</div>
+			
+	<div id="mySidenav" class="sidenav" style = "width: 0px; visibility: hidden; background-color:grey; border-right: solid; border-width: 1px;">
+		<div class = "well shadow">
+			<div style = "margin-bottom: 5px;">
+					<!--<button class ="btn btn-default" onclick="markAll()">Mark All</button>-->
+				<button class ="btn btn-default" onclick="unMarkAll()">Unmark All</button>
+				<button class ="btn btn-default" onclick="remove()">Remove</button>
+			</div>
+			<div id="list" class = "resultPanel hh" style="overflow-y: scroll; overflow-x: hidden; background-color: white;">	
+			</div>	
 		</div>
-
-	<div id = "mainrow" class="row" style = "margin-top: 50px; height: 100%; position: relative; z-index: 99; padding: 7px;">
+	</div>
+	
+	<div style = "margin-top: 60px;"></div>
+	
+	<!--<div class = "row">
+		<div class = "col-lg-12">	
+			<div class = "container">
+				<div id = "info" class="alert alert-success alert-dismissable">
+					<a href="#" class="close" data-dismiss="alert" aria-label="close"> x </a>
+					<strong>Success!</strong> This alert box could indicate a successful or positive action.
+				</div>
+			</div>
+		</div>
+	</div>-->
+	
+	<div id = "mainrow" class="row" style = "height: 100%; position: relative; z-index: 99;">
+		
 		<!-- <div class="col-xs-12 col-lg-3" style = "margin-top: 22px;"></div>-->
 		<!-- <div class="col-xs-12 col-lg-3" style = "margin-top: 22px;">
 			<div class = "well shadow">
@@ -241,7 +256,7 @@
 	
 		<div id = "canvasRow" class="col-xs-12 col-lg-offset-1 col-lg-4">
 			
-			<div id = "canvasWell" class = "well shadow" style = "margin-top: 22px;">
+			<div id = "canvasWell" class = "well shadow" style = "margin-top: 6px;">
 				<!--<table style = "width: 100%; margin-bottom: 10px"> 
 					<tr style = "text-align: center; background-color: white;">
 						<td>1</td><td>2</td><td>3</td><td>4</td><td>5</td>
@@ -259,14 +274,14 @@
 			</div>
 		</div>
 		
-		<div id = "strict result" class="col-xs-12 col-lg-4" style = "padding: 22px;">
+		<div id = "strict result" class="col-xs-12 col-lg-4" style = "padding: 6px;">
 			<div id = "canvasWell" class = "well shadow" style = "height: 100%;">
 				<div class="row">
 					<div class="col-xs-12">
 						<div style = "float: left;">Exact Match</div> 
 						<div style = "float: right; top: 0;">
-							<button id = "switchBtn" class ="btn btn-default" onClick="switchButtonn()">Switch to Kanji</button>
 							<button id = "strokeBtn" class ="btn btn-default" style = "display: none;" onclick="toggleStroke()">Show Stroke</button>
+							<button id = "switchBtn" class ="btn btn-default" onClick="switchButtonn()">Switch to Kanji</button>
 						</div>
 					</div>
 				</div>	
@@ -865,6 +880,8 @@
 				div.style.backgroundColor = '#7a8787';
 				$('#strict0 font').html(reminderList[unmarkedIndex].meaning);
 				$('#strict0 font').css('font-size', '40px');
+			}else{
+				alert("There are no unmarked kanji left.");
 			}
 	}
 	
@@ -883,7 +900,8 @@
 				div.checked = true;
 				saveList();
 				$('#output').val('');
-				
+				$('#switchBtn').html('Switch to kanji');
+		        $('#strokeBtn').css('display', 'none');
 				findUnmarked();
 			
 				
@@ -1361,69 +1379,14 @@
 		myBoard.ev.bind('board:startDrawing',getStrokeCoordinate);
 	}
 	
-	//89.5 %
-	//[[109.0,132.0:60.0,165.0], [101.0,164.0:55.0,199.0], [74.0,179.0:83.0,237.0], [134.0,128.0:182.0,141.0], [131.0,160.0:181.0,166.0], [167.0,164.0:145.0,227.0]]
-	//[[108,9:10,87], [92,84:0,166], [38,119:56,255], [159,0:255,30], [153,75:253,89], [225,84:181,232]]
-	
-	/*var inputList= []; 
-	 potentialKanji.addStroke(new InputStroke(109.0, 132.0, 60.0, 165.0));
-	 potentialKanji.addStroke(new InputStroke(101.0, 164.0, 55.0, 199.0));
-	 potentialKanji.addStroke(new InputStroke(74.0, 179.0, 83.0, 237.0));
-	 potentialKanji.addStroke(new InputStroke(134.0, 128.0, 182.0, 141.0));
-	 potentialKanji.addStroke(new InputStroke(131.0, 160.0, 181.0, 166.0));
-	 potentialKanji.addStroke(new InputStroke(167.0, 164.0, 145.0, 227.0));
-	 
-	 potentialKanji.normaliseStroke();
-	 console.log(potentialKanji.strokes[0]);
-	 
-	 potentialKanji.findDirections();
-	 
-	 var strict = new StrictComparer(kanjiInfo);
-	 console.log(strict.getMatchScore(potentialKanji));*/
-	 
 	 var inputList= []; 
-	 //potentialKanji.addStroke(new InputStroke(1, 2, 3, 4));
-	 //potentialKanji.addStroke(new InputStroke(5, 6, 7, 8));
-	 //potentialKanji.addStroke(new InputStroke(15, 16, 17, 98));
-	 //potentialKanji.addStroke(new InputStroke(15, 16, 17, 98));
-	 //potentialKanji.addStroke(new InputStroke(15, 16, 17, 98));
-	 //potentialKanji.addStroke(new InputStroke(15, 16, 17, 98));
-	 
-	 
-	 //this is how to init potential kanji
-	 /*var potentialKanjiTest = new KanjiInfo("?");
-     potentialKanjiTest.addStroke(new InputStroke(59.0,190.0,156.0,189.0));
- 	 potentialKanjiTest.normaliseStroke();
-	 potentialKanjiTest.findDirections();
-	 
-	 var strict = new StrictComparer(potentialKanjiTest);
-		var strokeCount = potentialKanjiTest.strokes.length;  
-		if(kanjiList[strokeCount]  == null){	
-			console.log('how can there be a kanji with more than 30 strokes -*-');
-		}else{
-			var kanjiWithSameStroke = kanjiList[strokeCount];
-			for(var i = 0; i < kanjiWithSameStroke.length; i++){
-				var score = strict.getMatchScore(kanjiWithSameStroke[i]);
-			}
-		} */
-	 
-	 /*potentialKanji.strokeStarts;
-	 potentialKanji.strokeEnds;
-	 potentialKanji.strokeDirections;
-	 potentialKanji.moveDirections*/
-	 //potentialKanji.printStroke();
-	 
-	
-	//store lable information
+
 	function copy(){
 		$('#output').select();
 		bool = document.execCommand("copy");
 	}
 	
-	
-	
-	
-		//Fuzzy Comparer
+	//Fuzzy Comparer
 	var FuzzyComparer = function(drawn){
 	
 		this.drawnPairs = FuzzyComparer.convertKanjiInfo(drawn);
